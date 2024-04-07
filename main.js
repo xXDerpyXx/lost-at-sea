@@ -201,6 +201,68 @@ class body{
     }
 }
 
+function healthTick(b,part){
+    if(part == null){
+        part = "spine"
+    }
+    for(var p in b[part]){
+        if(p != "hp" && p != "modifiers" && p != "required"){
+            b[part] = healthTick(b[part],p)
+        }
+    }
+    return b[part]
+}
+
+function parthp(part){
+    var hp = part.hp
+    var softHp = part.hp
+    for(var k in part.modifiers){
+        hp -= part.modifiers[k].damage
+        softHp -= part.modifiers[k].damage
+        softHp -= part.modifiers[k].softDamagedamage
+    }
+    if(hp < 0){
+        hp = 0;
+    }
+
+    return [hp,softHp];
+}
+
+function parthpString(part){
+    var hp = parthp(part)
+    var percentage = Math.floor((hp[0]/part.hp)*100)
+    var softPercentage = Math.floor((hp[1]/part.hp)*100)
+    if(percentage == softPercentage){
+        return percentage+"%"
+    }else{
+        return softPercentage+"% ("+percentage+"%)"
+    }
+
+}
+
+function bodyToString(b,part,layer){
+    var finalString = ""
+    if(layer == null){
+        layer = 0;
+    }else{
+        layer++;
+    }
+    if(part == null){
+        part = "spine"
+    }
+    finalString = part + " <" + parthpString(b[part]) + ">";
+    for(var p in b[part]){
+        if(p != "hp" && p != "modifiers" && p != "required"){
+            finalString += "\n"
+            for(var i = 0; i < layer; i++){
+                finalString += "|  "
+            }
+            finalString += "["+bodyToString(b[part],p,layer)+"]"
+        }
+    }
+    return finalString
+}
+
 class player{
     constructor(id){
         // Player's discord id
@@ -214,6 +276,8 @@ class player{
 
         this.time = 12; //current time of day
         this.daysAtSea = 0; // Player's time spent in the game
+        
+        this.body = new body()
     }
 }
 
@@ -225,9 +289,15 @@ var c = new SlashCommandBuilder()
 
 commands.push(c)
 
-var c = new SlashCommandBuilder()
+c = new SlashCommandBuilder()
 .setName('checktime')
 .setDescription('Checks the time.')
+
+commands.push(c)
+
+c = new SlashCommandBuilder()
+.setName('checkbody')
+.setDescription('Checks your body.')
 
 commands.push(c)
 
@@ -291,6 +361,11 @@ client.on('interactionCreate', async (interaction) => {
 
         if(interaction.commandName == "checktime"){
             interaction.reply(formatTime(players[pid].time));
+            return;
+        }
+
+        if(interaction.commandName == "checkbody"){
+            interaction.reply(bodyToString(players[pid].body));
             return;
         }
     }
