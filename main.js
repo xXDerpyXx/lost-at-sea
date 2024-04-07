@@ -15,6 +15,18 @@ const client = new Client({ intents: [
 // Theology is solved! :troll:
 var gods = ["246589957165023232","216465467806580737"]
 
+var items = {}
+
+function loadItems(){
+decks = {}
+fs.readdirSync("./items/").forEach(file => {
+    console.log("loading "+file);
+    items[file.split(".")[0]] = require("./items/"+file)
+});
+}
+
+loadItems()
+
 /**
  * Format time into a human friendly format.
  * Take a time value, converts it into a formatted time string in hh:mm (am/pm) format.
