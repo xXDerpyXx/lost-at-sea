@@ -22,6 +22,7 @@ decks = {}
 fs.readdirSync("./items/").forEach(file => {
     console.log("loading "+file);
     items[file.split(".")[0]] = require("./items/"+file)
+    console.log(items[file.split(".")[0]].texture)
 });
 }
 
