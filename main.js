@@ -48,117 +48,154 @@ function formatTime(time){
     return timeString;
 }
 
+class modifier{
+    constructor(n){
+        this.name = n;
+        this.damage = 0; // flat rate damage done to body part when modifier is applied
+        this.growth = 0; // rate that damage increases during medical check
+        this.stage = "malignant"; // stage of cancer/infection/disease (malignant/immune/etc)
+        this.spreads = false; // spreads to other body parts?
+        this.spreadRate = 0; // chance of spreading during medical tick
+        this.softDamage = 0; //"damage" that cant result in a bodypart being destroyed
+        this.immunity = 0; // immunity to infection or disease
+        this.unusable = false; // renders the bodypart unusable regardless of damage
+    }
+
+}
+
 class body{
     constructor(){
-        // Dummy body parts, no implementation yet
         this.spine = {
             hp:10,
+            modifiers:[],
             chest:{
                 hp:10,
+                modifiers:[],
                 required:true,
                 neck:{
                     hp:8,
+                    modifiers:[],
                     required:true,
                     head:{
                         hp:10,
+                        modifiers:[],
                         required:true,
                         skull:{
                             hp:10,
+                            modifiers:[],
                             brain:{
                                 hp:10,
+                                modifiers:[],
                                 required:true
                             }
                         },
-                        leftEye:{hp:5},
-                        rightEye:{hp:5},
-                        leftEar:{hp:5},
-                        rightEar:{hp:5},
+                        leftEye:{hp:5,modifiers:[]},
+                        rightEye:{hp:5,modifiers:[]},
+                        leftEar:{hp:5,modifiers:[]},
+                        rightEar:{hp:5,modifiers:[]},
                         mouth:{
                             hp:5,
-                            tongue:{hp:3},
-                            upperTeeth:{hp:5},
-                            lowerTeeth:{hp:5}
+                            modifiers:[],
+                            tongue:{hp:3,modifiers:[]},
+                            upperTeeth:{hp:5,modifiers:[]},
+                            lowerTeeth:{hp:5,modifiers:[]}
                         },
-                        nose:{hp:5}
+                        nose:{hp:5,modifiers:[]}
                     }
                 },
                 leftShoulder:{
                     hp:7,
+                    modifiers:[],
                     leftUpperArm:{
                         hp:5,
+                        modifiers:[],
                         leftLowerArm:{
                             hp:5,
+                            modifiers:[],
                             leftHand:{
                                 hp:5,
-                                leftThumb:{hp:3},
-                                leftIndexFinger:{hp:3},
-                                leftMiddleFinger:{hp:2},
-                                leftRingFinger:{hp:2},
-                                leftPinkyFinger:{hp:1}
+                                modifiers:[],
+                                leftThumb:{hp:3,modifiers:[]},
+                                leftIndexFinger:{hp:3,modifiers:[]},
+                                leftMiddleFinger:{hp:2,modifiers:[]},
+                                leftRingFinger:{hp:2,modifiers:[]},
+                                leftPinkyFinger:{hp:1,modifiers:[]}
                             }
                         }
                     }
                 },
                 rightShoulder:{
                     hp:7,
+                    modifiers:[],
                     rightUpperArm:{
                         hp:5,
+                        modifiers:[],
                         rightLowerArm:{
                             hp:5,
+                            modifiers:[],
                             rightHand:{
                                 hp:5,
-                                rightThumb:{hp:3},
-                                rightIndexFinger:{hp:3},
-                                rightMiddleFinger:{hp:2},
-                                rightRingFinger:{hp:1},
-                                rightPinkyFinger:{hp:1}
+                                modifiers:[],
+                                rightThumb:{hp:3,modifiers:[]},
+                                rightIndexFinger:{hp:3,modifiers:[]},
+                                rightMiddleFinger:{hp:2,modifiers:[]},
+                                rightRingFinger:{hp:1,modifiers:[]},
+                                rightPinkyFinger:{hp:1,modifiers:[]}
                             }
                         }
                     }
                 },
                 heart:{
                     hp:7,
+                    modifiers:[],
                     required:true
                 },
-                leftLung:{hp:5},
-                rightLung:{hp:5},
-                stomach:{hp:5},
-                liver:{hp:5}
+                leftLung:{hp:5,modifiers:[]},
+                rightLung:{hp:5,modifiers:[]},
+                stomach:{hp:5,modifiers:[]},
+                liver:{hp:5,modifiers:[]}
             },
             lowerTorso:{
                 hp:10,
+                modifiers:[],
                 required:true,
                 leftUpperLeg:{
                     hp:7,
+                    modifiers:[],
                     leftLowerLeg:{
                         hp:7,
+                        modifiers:[],
                         leftFoot:{
                             hp:5,
-                            leftFirstToe:{hp:3},
-                            leftSecondToe:{hp:3},
-                            leftThirdToe:{hp:2},
-                            leftFourthToe:{hp:2},
-                            leftFifthToe:{hp:1}
+                            modifiers:[],
+                            leftFirstToe:{hp:3,modifiers:[]},
+                            leftSecondToe:{hp:3,modifiers:[]},
+                            leftThirdToe:{hp:2,modifiers:[]},
+                            leftFourthToe:{hp:2,modifiers:[]},
+                            leftFifthToe:{hp:1,modifiers:[]}
                         }
                     }
                 },
                 rightUpperLeg:{
                     hp:7,
+                    modifiers:[],
                     rightLowerLeg:{
                         hp:7,
+                        modifiers:[],
                         rightFoot:{
                             hp:5,
-                            rightFirstToe:{hp:3},
-                            rightSecondToe:{hp:3},
-                            rightThirdToe:{hp:2},
-                            rightFourthToe:{hp:2},
-                            rightFifthToe:{hp:1}
+                            modifiers:[],
+                            rightFirstToe:{hp:3,modifiers:[]},
+                            rightSecondToe:{hp:3,modifiers:[]},
+                            rightThirdToe:{hp:2,modifiers:[]},
+                            rightFourthToe:{hp:2,modifiers:[]},
+                            rightFifthToe:{hp:1,modifiers:[]}
                         }
                     }
                 },
-                intestines:{hp:5},
-                leftKidney:{hp:5},
-                rightKidney:{hp:5}
+                intestines:{hp:5,modifiers:[]},
+                leftKidney:{hp:5,modifiers:[]},
+                rightKidney:{hp:5,modifiers:[]}
             }
         }
     }
