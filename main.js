@@ -77,6 +77,7 @@ class BodyPart{
 class Head extends BodyPart{
     constructor() {
         super();
+        // VERY IMPORTANT ORGAN
         this.brain = {};
     }
 }
