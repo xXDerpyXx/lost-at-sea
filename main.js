@@ -265,7 +265,7 @@ function bodyToString(b,part,layer){
             finalString += "["+bodyToString(b[part],p,layer)+"]"
         }
     }
-    return "`"+finalString+"`"
+    return "```"+finalString+"```"
 }
 
 class player{
