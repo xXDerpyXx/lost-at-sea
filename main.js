@@ -264,7 +264,7 @@ function bodyToString(b,part,layer,layerString){
         part = "spine"
     }
 
-    finalString = part + " <" + parthpString(b[part]) + ">";
+    finalString = "["+part + " <" + parthpString(b[part]) + ">]";
     var partsDone = 0;
     var totalParts = subPartCount(b[part]);
     layer++;
@@ -304,7 +304,7 @@ function bodyToString(b,part,layer,layerString){
                     //layerString += "    "
             //}
             
-            finalString += layerString+"["+bodyToString(b[part],p,layer,layerString)+"]"
+            finalString += layerString+""+bodyToString(b[part],p,layer,layerString)
         }
     }
 
