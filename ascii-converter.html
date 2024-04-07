@@ -1,0 +1,18 @@
+<textarea id="maintext" width="500px" height="500px"></textarea>
+
+<button onclick="convert()">convert</button>
+
+<script>
+
+    function convert(){
+        var temp = document.getElementById("maintext").value
+        console.log(temp)
+        while(temp.includes("\n"))
+            temp = temp.replace("\n","[newline]")
+
+        while(temp.includes("[newline]"))
+            temp = temp.replace("[newline]","\\n")
+
+        var temp = document.getElementById("maintext").value = temp
+    }
+</script>
