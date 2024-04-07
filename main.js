@@ -243,7 +243,7 @@ function parthpString(part){
 function bodyToString(b,part,layer){
     var finalString = ""
     if(layer == null){
-        layer = 0
+        layer = 0;
     }else{
         layer++;
     }
@@ -254,10 +254,14 @@ function bodyToString(b,part,layer){
     for(var p in b[part]){
         if(p != "hp" && p != "modifiers" && p != "required"){
             finalString += "\n"
-            for(var i = 0; i < layer - 1; i++){
-                finalString += "    " // four spaces
+            for(var i = 0; i < layer; i++){
+
+                if (i === layer - 1){
+                    finalString += "├──"
+                } else {
+                    finalString += "|  "
+                }
             }
-            finalString += "├── "
             finalString += "["+bodyToString(b[part],p,layer)+"]"
         }
     }
