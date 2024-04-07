@@ -12,31 +12,40 @@ const client = new Client({ intents: [
 ]
  });
 
-
+// Theology is solved! :troll:
 var gods = ["246589957165023232","216465467806580737"]
 
-function formatTime(t){
-    var s = "";
+/**
+ * Format time into a human friendly format.
+ * Take a time value, converts it into a formatted time string in hh:mm (am/pm) format.
+ * */
+function formatTime(time){
+    // Our result string
+    var timeString = "";
+
     var suffix = "am"
-    var parts = toString(t).split(".")
-    if(!toString(t).includes(".")){
-        parts[0] = t;
+    var parts = toString(time).split(".")
+    // No decimal point time
+    if(!toString(time).includes(".")){
+        parts[0] = time;
         parts[1] = "0"
     }
     
-    
     parts[0] = parseInt(parts[0])+1
     console.log(parts[0])
+
+    // Check if afternoon
     if(parts[0] > 12){
         suffix = "pm"
         parts[0] = parts[0]-12
     }
+
     parts[1] = (parseInt(parts[1])/100)*60
     if(parts[1] < 10){
         parts[1] = "0"+parts[1]
     }
-    s = parts[0]+":"+parts[1]+suffix
-    return s;
+    timeString = parts[0]+":"+parts[1]+suffix
+    return timeString;
 }
 
 class body{
@@ -47,10 +56,16 @@ class body{
 
 class player{
     constructor(id){
+        // Player's discord id
         this.id = id;
-        this.lattitude = (Math.random()*20)-10
+        // When the player first starts the game, set their latitude randomly
+        this.latitude = (Math.random()*20)-10
+
+        // Internal properties
         this.hunger = 100;
         this.sleep = 100;
+
+        // Player's time spent in the game
         this.time = 12;
         this.daysAtSea = 0;
     }
@@ -60,13 +75,13 @@ var commands = [];
 
 var c = new SlashCommandBuilder()
 .setName('getlost')
-.setDescription('gets you lost at sea')
+.setDescription('Gets you lost at sea.')
 
 commands.push(c)
 
 var c = new SlashCommandBuilder()
 .setName('checktime')
-.setDescription('checks the time')
+.setDescription('Checks the time.')
 
 commands.push(c)
 
@@ -84,6 +99,7 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
     }
   })();
 
+// Database of players
 var players = {}
 
 function randomFromArray(array){
@@ -98,18 +114,19 @@ var lostMessages = [
 client.on('messageCreate', (msg) => {
 })
 
-client.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async (interaction) => {
 
     if (!interaction.isChatInputCommand()) return;
 
     var pid = interaction.member.id;
 
     if(players[pid] == null && interaction.commandName != "getlost"){
-        interaction.reply("you aren't lost at sea, try using `/getlost`")
+        interaction.reply("you aren't lost at sea yet, try using `/getlost`")
         return;
     }else{
         if(interaction.commandName == "getlost"){
             interaction.reply(randomFromArray(lostMessages))
+            // Generate the player properties mapped to their user id
             players[pid] = new player(pid);
             return;
         }
