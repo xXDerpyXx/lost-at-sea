@@ -48,47 +48,73 @@ function formatTime(time){
     return timeString;
 }
 
-class Body{
+class body{
     constructor(){
         // Dummy body parts, no implementation yet
-        this.head = new Head();
-        this.neck = new Neck();
-        this.chest = {};
-        this.lowerTorso = {};
-        this.leftArm = {};
-        this.rightArm = {};
-        this.leftHand = {};
-        this.rightHand = {};
-        this.leftLeg = {};
-        this.rightLeg = {};
-        this.leftFoot = {};
-        this.rightFoot = {};
-    }
-}
-
-// Body part class
-class BodyPart{
-        constructor() {
-            this.health = 100;
-            this.statusEffects = [];
+        this.spine = {
+            chest:{
+                neck:{
+                    head:{
+                        skull:{
+                            brain:{}
+                        },
+                        leftEye:{},
+                        rightEye:{},
+                        leftEar:{},
+                        rightEar:{},
+                        mouth:{
+                            tongue:{},
+                            upperTeeth:{},
+                            lowerTeeth:{}
+                        },
+                        nose:{}
+                    }
+                },
+                leftShoulder:{
+                    leftUpperArm:{
+                        leftLowerArm:{
+                            leftHand:{
+                                leftThumb:{},
+                                leftIndexFinger:{},
+                                leftMiddleFinger:{},
+                                leftRingFinger:{},
+                                leftPinkyFinger:{}
+                            }
+                        }
+                    }
+                },
+                rightShoulder:{
+                    rightUpperArm:{
+                        rightLowerArm:{
+                            rightHand:{
+                                rightThumb:{},
+                                rightIndexFinger:{},
+                                rightMiddleFinger:{},
+                                rightRingFinger:{},
+                                rightPinkyFinger:{}
+                            }
+                        }
+                    }
+                }
+            },
+            lowerTorso:{
+                leftUpperLeg:{
+                    leftLowerLeg:{
+                        leftFoot:{
+                            leftFirstToe:{},
+                            leftSecondToe:{},
+                            leftThirdToe:{},
+                            leftFourthToe:{},
+                            leftFifthToe:{}
+                        }
+                    }
+                }
+            }
         }
-}
-
-class Head extends BodyPart{
-    constructor() {
-        super();
-        // VERY IMPORTANT ORGAN
-        this.brain = {};
     }
 }
 
-class Neck extends BodyPart{
-    constructor(props) {
-        super(props);
-    }
-}
-
-class Player{
+class player{
     constructor(id){
         // Player's discord id
         this.id = id;
@@ -171,7 +197,7 @@ client.on('interactionCreate', async (interaction) => {
         if(interaction.commandName == "getlost"){
             interaction.reply(randomFromArray(lostMessages))
             // Generate the player properties mapped to their user id
-            players[pid] = new Player(pid);
+            players[pid] = new player(pid);
             save();
             return;
         }
