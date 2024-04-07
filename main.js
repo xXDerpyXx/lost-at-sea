@@ -240,8 +240,21 @@ function parthpString(part){
 
 }
 
-function bodyToString(b,part,layer){
+function subPartCount(part){
+    count = 0;
+    for(var p in part){
+        if(p != "hp" && p != "modifiers" && p != "required"){
+            count++
+        }
+    }
+    return count;
+}
+
+function bodyToString(b,part,layer,layerString){
     var finalString = ""
+    if(layerString == null){
+        layerString = ""
+    }
     if(layer == null){
         layer = 0;
     }else{
@@ -250,19 +263,48 @@ function bodyToString(b,part,layer){
     if(part == null){
         part = "spine"
     }
+
     finalString = part + " <" + parthpString(b[part]) + ">";
+    var partsDone = 0;
+    var totalParts = subPartCount(b[part]);
+    layer++;
+    while(layerString.includes("├──"))
+        layerString = layerString.replace("├──","│  ")
+
+    while(layerString.includes("└──"))
+        layerString = layerString.replace("└──","   ")
+    var oldLayerString = layerString
     for(var p in b[part]){
         if(p != "hp" && p != "modifiers" && p != "required"){
             finalString += "\n"
+            partsDone++;
+            /*
             for(var i = 0; i < layer; i++){
-
                 if (i === layer - 1){
-                    finalString += "├───"
+                    if(partsDone == totalParts)
+                        finalString += "└───"
+                    else
+                        finalString += "├───"
                 } else {
-                    finalString += "|   "
+                    if(i == 0)
+                        finalString += "│   "
+                    else
+                        finalString += "    "
                 }
-            }
-            finalString += "["+bodyToString(b[part],p,layer)+"]"
+            }*/
+            //if (i === layer - 1){
+                if(partsDone == totalParts)
+                    layerString = oldLayerString+"└──"
+                else
+                    layerString = oldLayerString+"├──"
+            //} else {
+                //if(i == 0)
+                    //layerString += "│   "
+                //else
+                    //layerString += "    "
+            //}
+            
+            finalString += layerString+"["+bodyToString(b[part],p,layer,layerString)+"]"
         }
     }
 
@@ -371,7 +413,7 @@ client.on('interactionCreate', async (interaction) => {
         }
 
         if(interaction.commandName == "checkbody"){
-            interaction.reply(bodyToString(players[pid].body));
+            interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
             return;
         }
     }
