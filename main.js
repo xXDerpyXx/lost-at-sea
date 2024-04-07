@@ -52,63 +52,113 @@ class body{
     constructor(){
         // Dummy body parts, no implementation yet
         this.spine = {
+            hp:10,
             chest:{
+                hp:10,
+                required:true,
                 neck:{
+                    hp:8,
+                    required:true,
                     head:{
+                        hp:10,
+                        required:true,
                         skull:{
-                            brain:{}
+                            hp:10,
+                            brain:{
+                                hp:10,
+                                required:true
+                            }
                         },
-                        leftEye:{},
-                        rightEye:{},
-                        leftEar:{},
-                        rightEar:{},
+                        leftEye:{hp:5},
+                        rightEye:{hp:5},
+                        leftEar:{hp:5},
+                        rightEar:{hp:5},
                         mouth:{
-                            tongue:{},
-                            upperTeeth:{},
-                            lowerTeeth:{}
+                            hp:5,
+                            tongue:{hp:3},
+                            upperTeeth:{hp:5},
+                            lowerTeeth:{hp:5}
                         },
-                        nose:{}
+                        nose:{hp:5}
                     }
                 },
                 leftShoulder:{
+                    hp:7,
                     leftUpperArm:{
+                        hp:5,
                         leftLowerArm:{
+                            hp:5,
                             leftHand:{
-                                leftThumb:{},
-                                leftIndexFinger:{},
-                                leftMiddleFinger:{},
-                                leftRingFinger:{},
-                                leftPinkyFinger:{}
+                                hp:5,
+                                leftThumb:{hp:3},
+                                leftIndexFinger:{hp:3},
+                                leftMiddleFinger:{hp:2},
+                                leftRingFinger:{hp:2},
+                                leftPinkyFinger:{hp:1}
                             }
                         }
                     }
                 },
                 rightShoulder:{
+                    hp:7,
                     rightUpperArm:{
+                        hp:5,
                         rightLowerArm:{
+                            hp:5,
                             rightHand:{
-                                rightThumb:{},
-                                rightIndexFinger:{},
-                                rightMiddleFinger:{},
-                                rightRingFinger:{},
-                                rightPinkyFinger:{}
+                                hp:5,
+                                rightThumb:{hp:3},
+                                rightIndexFinger:{hp:3},
+                                rightMiddleFinger:{hp:2},
+                                rightRingFinger:{hp:1},
+                                rightPinkyFinger:{hp:1}
                             }
                         }
                     }
-                }
+                },
+                heart:{
+                    hp:7,
+                    required:true
+                },
+                leftLung:{hp:5},
+                rightLung:{hp:5},
+                stomach:{hp:5},
+                liver:{hp:5}
             },
             lowerTorso:{
+                hp:10,
+                required:true,
                 leftUpperLeg:{
+                    hp:7,
                     leftLowerLeg:{
+                        hp:7,
                         leftFoot:{
-                            leftFirstToe:{},
-                            leftSecondToe:{},
-                            leftThirdToe:{},
-                            leftFourthToe:{},
-                            leftFifthToe:{}
+                            hp:5,
+                            leftFirstToe:{hp:3},
+                            leftSecondToe:{hp:3},
+                            leftThirdToe:{hp:2},
+                            leftFourthToe:{hp:2},
+                            leftFifthToe:{hp:1}
                         }
                     }
-                }
+                },
+                rightUpperLeg:{
+                    hp:7,
+                    rightLowerLeg:{
+                        hp:7,
+                        rightFoot:{
+                            hp:5,
+                            rightFirstToe:{hp:3},
+                            rightSecondToe:{hp:3},
+                            rightThirdToe:{hp:2},
+                            rightFourthToe:{hp:2},
+                            rightFifthToe:{hp:1}
+                        }
+                    }
+                },
+                intestines:{hp:5},
+                leftKidney:{hp:5},
+                rightKidney:{hp:5}
             }
         }
     }
