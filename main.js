@@ -50,7 +50,19 @@ function formatTime(time){
 
 class body{
     constructor(){
-
+        // Dummy body parts, no implementation yet
+        this.head = {};
+        this.neck = {];
+        this.chest = {};
+        this.lowerTorso = {};
+        this.leftArm = {};
+        this.rightArm = {};
+        this.leftHand = {};
+        this.rightHand = {};
+        this.leftLeg = {};
+        this.rightLeg = {};
+        this.leftFoot = {};
+        this.rightFoot = {};
     }
 }
 
