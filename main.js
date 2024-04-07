@@ -48,11 +48,11 @@ function formatTime(time){
     return timeString;
 }
 
-class body{
+class Body{
     constructor(){
         // Dummy body parts, no implementation yet
-        this.head = {};
-        this.neck = {];
+        this.head = new Head();
+        this.neck = new Neck();
         this.chest = {};
         this.lowerTorso = {};
         this.leftArm = {};
@@ -66,7 +66,28 @@ class body{
     }
 }
 
-class player{
+// Body part class
+class BodyPart{
+        constructor() {
+            this.health = 100;
+            this.statusEffects = [];
+        }
+}
+
+class Head extends BodyPart{
+    constructor() {
+        super();
+        this.brain = {};
+    }
+}
+
+class Neck extends BodyPart{
+    constructor(props) {
+        super(props);
+    }
+}
+
+class Player{
     constructor(id){
         // Player's discord id
         this.id = id;
@@ -149,7 +170,7 @@ client.on('interactionCreate', async (interaction) => {
         if(interaction.commandName == "getlost"){
             interaction.reply(randomFromArray(lostMessages))
             // Generate the player properties mapped to their user id
-            players[pid] = new player(pid);
+            players[pid] = new Player(pid);
             save();
             return;
         }
