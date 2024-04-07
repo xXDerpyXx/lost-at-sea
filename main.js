@@ -250,8 +250,10 @@ function subPartCount(part){
     return count;
 }
 
-function bodyToString(b,part,layer,layerString){
-    var finalString = ""
+function bodyToString(body,partName,layer,layerString){
+    var finalString = "" // Result
+
+    // Establish default values
     if(layerString == null){
         layerString = ""
     }
@@ -260,57 +262,40 @@ function bodyToString(b,part,layer,layerString){
     }else{
         layer++;
     }
-    if(part == null){
-        part = "spine"
+    if(partName == null){ // We start from the base, which is the spine
+        partName = "spine"
     }
 
     // Highlight if the part is required for survival!
-    if (b[part].required !== undefined && b[part].required === true){
-        finalString = "["+part + " <" + parthpString(b[part]) + ">] *";
+    if (body[partName].required !== undefined && body[partName].required === true){
+        finalString = "["+partName + " <" + parthpString(body[partName]) + ">] *";
     } else {
-        finalString = "["+part + " <" + parthpString(b[part]) + ">]";
+        finalString = "["+partName + " <" + parthpString(body[partName]) + ">]";
     }
 
-    var partsDone = 0;
-    var totalParts = subPartCount(b[part]);
+    let partsDone = 0;
+    let totalParts = subPartCount(body[partName]);
+
+    //Construct the layerString
     layer++;
     while(layerString.includes("├──"))
         layerString = layerString.replace("├──","│  ")
 
     while(layerString.includes("└──"))
         layerString = layerString.replace("└──","   ")
-    var oldLayerString = layerString
-    for(var p in b[part]){
-        if(p != "hp" && p != "modifiers" && p != "required"){
+    let oldLayerString = layerString
+
+    for(let subBodyPart in body[partName]){
+        // Check through every sub-body-part that body part has (exclude keys that aren't sub-body-parts ofc)
+        if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
             finalString += "\n"
             partsDone++;
-            /*
-            for(var i = 0; i < layer; i++){
-                if (i === layer - 1){
-                    if(partsDone == totalParts)
-                        finalString += "└───"
-                    else
-                        finalString += "├───"
-                } else {
-                    if(i == 0)
-                        finalString += "│   "
-                    else
-                        finalString += "    "
-                }
-            }*/
-            //if (i === layer - 1){
-                if(partsDone == totalParts)
+                if(partsDone === totalParts)
                     layerString = oldLayerString+"└──"
                 else
                     layerString = oldLayerString+"├──"
-            //} else {
-                //if(i == 0)
-                    //layerString += "│   "
-                //else
-                    //layerString += "    "
-            //}
-            
-            finalString += layerString+""+bodyToString(b[part],p,layer,layerString)
+
+            finalString += layerString+""+bodyToString(body[partName],subBodyPart,layer,layerString)
         }
     }
 
