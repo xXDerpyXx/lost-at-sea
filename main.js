@@ -257,15 +257,15 @@ function bodyToString(b,part,layer){
             for(var i = 0; i < layer; i++){
 
                 if (i === layer - 1){
-                    finalString += "├──"
+                    finalString += "├───"
                 } else {
-                    finalString += "|  "
+                    finalString += "|   "
                 }
             }
             finalString += "["+bodyToString(b[part],p,layer)+"]"
         }
     }
-    return finalString
+    return "`"+finalString+"`"
 }
 
 class player{
