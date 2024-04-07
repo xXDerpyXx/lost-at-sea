@@ -58,16 +58,15 @@ class player{
     constructor(id){
         // Player's discord id
         this.id = id;
-        // When the player first starts the game, set their latitude randomly
+        // When the player first starts the game, set their latitude randomly near the equator
         this.latitude = (Math.random()*20)-10
 
         // Internal properties
         this.hunger = 100;
         this.sleep = 100;
 
-        // Player's time spent in the game
-        this.time = 12;
-        this.daysAtSea = 0;
+        this.time = 12; //current time of day
+        this.daysAtSea = 0; // Player's time spent in the game
     }
 }
 
@@ -99,8 +98,19 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
     }
   })();
 
-// Database of players
+// "Database" of players
 var players = {}
+
+function save(){
+    fs.writeFileSync("players.json",JSON.stringify(players))
+}
+
+function load(){
+    var temp = fs.readFileSync("players.json")
+    players = JSON.parse(temp)
+}
+
+load()
 
 function randomFromArray(array){
     return array[Math.floor(Math.random() * array.length)];
@@ -128,6 +138,7 @@ client.on('interactionCreate', async (interaction) => {
             interaction.reply(randomFromArray(lostMessages))
             // Generate the player properties mapped to their user id
             players[pid] = new player(pid);
+            save();
             return;
         }
 
