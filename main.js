@@ -264,7 +264,13 @@ function bodyToString(b,part,layer,layerString){
         part = "spine"
     }
 
-    finalString = "["+part + " <" + parthpString(b[part]) + ">]";
+    // Highlight if the part is required for survival!
+    if (b[part].required !== undefined && b[part].required === true){
+        finalString = "["+part + " <" + parthpString(b[part]) + ">] *";
+    } else {
+        finalString = "["+part + " <" + parthpString(b[part]) + ">]";
+    }
+
     var partsDone = 0;
     var totalParts = subPartCount(b[part]);
     layer++;
