@@ -112,7 +112,7 @@ function formatTime(time){
     return timeString;
 }
 
-class modifier{
+class Modifier{
     constructor(n){
         this.name = n;
         this.damage = 0; // flat rate damage done to body part when modifier is applied
@@ -127,7 +127,7 @@ class modifier{
 
 }
 
-class body{
+class Body{
     constructor(){
         // Imported from spine.js file, because holy shit the datastructure is massive!
         this.spine = baseBody;
@@ -263,7 +263,7 @@ function applyModifier(bodyPart,targetPart,modifier){
     return bodyPart;
 }
 
-class player{
+class Player{
     constructor(id){
         // Player's discord id
         this.id = id;
@@ -279,7 +279,7 @@ class player{
         this.daysAtSea = 0; // Player's time spent in the game
         this.constantTime = 0; // hours of time in game TOTAL (used for timekeeping)
         
-        this.body = new body()
+        this.body = new Body()
     }
 }
 
@@ -428,7 +428,7 @@ client.on('interactionCreate', async (interaction) => {
             if(interaction.commandName == "shatter"){
                 var bt = interaction.options.getString("bodypart");
                 var target = getUserFromMention(interaction.options.getString("target"));
-                var mod = new modifier("shattered")
+                var mod = new Modifier("shattered")
                 mod.damage = 50
                 players[target].body = applyModifier(players[target].body,bt,mod)
                 interaction.reply("you shattered <@"+target+">'s "+bt)
@@ -438,7 +438,7 @@ client.on('interactionCreate', async (interaction) => {
         if(interaction.commandName == "getlost"){
             interaction.reply(randomFromArray(lostMessages))
             // Generate the player properties mapped to their user id
-            players[pid] = new player(pid);
+            players[pid] = new Player(pid);
             save();
             return;
         }
