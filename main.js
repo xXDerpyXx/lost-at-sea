@@ -154,6 +154,7 @@ class Player{
     }
 }
 
+
 function healthTick(b,part){
     if(part == null){
         part = "spine"
@@ -166,36 +167,52 @@ function healthTick(b,part){
     return b[part]
 }
 
-function parthp(part){
-    var hp = part.hp
-    var softHp = part.hp
-    for(var k in part.modifiers){
-        hp -= part.modifiers[k].damage
-        softHp -= part.modifiers[k].damage
-        softHp -= part.modifiers[k].softDamage
-    }
-    if(hp < 0){
-        hp = 0;
-    }
-    if(softHp < 0){
-        softHp = 0;
-    }
+/**
+ * Compute the HP (and softHP) of a body part
+ *
+ * @param bodyPart body part in question to get the HP computation
+ *
+ * */
+function getBodyPartHp(bodyPart){
+    let HP = bodyPart.hp
+    let softHP = bodyPart.hp
 
-    return [hp,softHp];
+    for(var i in bodyPart.modifiers){
+        HP -= bodyPart.modifiers[i].damage
+        softHP -= (bodyPart.modifiers[i].damage + bodyPart.modifiers[i].softDamage);
+    }
+    // Account for negative Health
+    if(HP < 0){ HP = 0; }
+    if(softHP < 0){ softHP = 0; }
+
+    // Return them as a pair
+    return [HP,softHP];
 }
 
-function parthpString(bodyPart){
-    var hp = parthp(bodyPart)
-    var percentage = Math.floor((hp[0]/bodyPart.hp)*100)
-    var softPercentage = Math.floor((hp[1]/bodyPart.hp)*100)
-    if(percentage == softPercentage){
-        return percentage+"%"
+/**
+ * Parse the HP and SoftHP into a string for the user to read
+ *
+ * @param bodyPart Body part in question to get it's HP to parse.
+ * */
+function parseBodyPartToString(bodyPart){
+    let HP, softHP
+    [HP, softHP] = getBodyPartHp(bodyPart)
+    let percantageHP = Math.floor((HP/bodyPart.hp)*100)
+    let percentageSoftHP = Math.floor((softHP/bodyPart.hp)*100)
+    if(percantageHP === percentageSoftHP){
+        return percantageHP+"%"
     }else{
-        return softPercentage+"% ("+percentage+"%)"
+        // Show both values
+        return `${percentageSoftHP}% (${percantageHP}%)`
     }
 }
 
-function subPartCount(bodyPart){
+/**
+ * Compute how many sub body parts a body part has
+ *
+ * @param bodyPart the body part in question
+ * */
+function getSubBodyPartCount(bodyPart){
     count = 0; // Where we build the result
     for(var subBodyPartKey in bodyPart){
         if(subBodyPartKey !== "hp" && subBodyPartKey !== "modifiers" && subBodyPartKey !== "required"){
@@ -237,10 +254,10 @@ function bodyToString(body,partName,layer,layerString){
     if(mods.length > 0){
         mods = " ("+mods+")"
     }
-    finalString = "["+partName + " <" + parthpString(body[partName]) + ">"+mods+"]"+highlight;
+    finalString = "["+partName + " <" + parseBodyPartToString(body[partName]) + ">"+mods+"]"+highlight;
 
     let partsDone = 0;
-    let totalParts = subPartCount(body[partName]);
+    let totalParts = getSubBodyPartCount(body[partName]);
 
     //Construct the layerString
     layer++;
