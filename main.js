@@ -150,6 +150,7 @@ class player{
         this.id = id;
         // When the player first starts the game, set their latitude randomly near the equator
         this.latitude = (Math.random()*20)-10
+        this.longitude = (Math.random()*360)-180
 
         // Internal properties
         this.hunger = 100;
@@ -361,13 +362,24 @@ function passTime(id,hours){
 function getPlayerLocation(id){
     let locationString = "";
     // We round to 4dp
-    let latitude = players[id].latitude.toFixed(4);
+    let latitude = Math.abs(players[id].latitude.toFixed(4));
+    let longitude = Math.abs(players[id].longitude.toFixed(4));
 
+    let latsuffix = "°S"
+    let lonsuffix = "°E"
     if (latitude < 0){ // Account for negative latitude (aka south of the equator)
-        locationString += `Your location is (${-(latitude)}°S)`;
+        latsuffix = "°S"
     } else {
-        locationString += `Your location is (${latitude}°N)`;
+        latsuffix = "°N"
     }
+
+    if (latitude < 0){ // Account for negative longitude
+        latsuffix = "°W"
+    } else {
+        latsuffix = "°E"
+    }
+
+    locationString += `Your location is (`+latitude+latsuffix+", "+longitude+lonsuffix+`)`;
 
 
     return locationString;
@@ -437,7 +449,7 @@ c = new SlashCommandBuilder()
 commands.push(c)
 
 c = new SlashCommandBuilder()
-    .setName('getlocation')
+    .setName('checklocation')
     .setDescription("get the player's location on the map")
 
 commands.push(c)
@@ -578,7 +590,7 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.commandName === "use"){
             interaction.reply("This is just a test for now")
         }
-        if (interaction.commandName === "getlocation"){
+        if (interaction.commandName === "checklocation"){
             interaction.reply(""+getPlayerLocation(pid)+"")
 
         }
