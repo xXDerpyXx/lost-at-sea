@@ -134,7 +134,7 @@ class body{
     }
 }
 
-class Player{
+class player{
     constructor(id){
         // Player's discord id
         this.id = id;
@@ -150,7 +150,7 @@ class Player{
         this.daysAtSea = 0; // Player's time spent in the game
         this.constantTime = 0; // hours of time in game TOTAL (used for timekeeping)
 
-        this.body = new Body()
+        this.body = new body()
     }
 }
 
@@ -172,7 +172,7 @@ function deadCheck(b,part){
     if(part == null){
         part = "spine"
     }
-    if(parthp(b)[0] == 0 && b.required){
+    if(getBodyPartHp(b)[0] == 0 && b.required){
         dead = true;
         return [b[part],dead]
     }
