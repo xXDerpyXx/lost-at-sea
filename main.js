@@ -264,6 +264,77 @@ function drawMap(x,y,radius){
     return output;
 }
 
+function colorifyMap(map){
+    // Consider putting into a different file as a json object
+    ansiColorMapper = {
+        " ":{
+            start: "",
+            end:""
+        },
+        "~":{ // blue
+            start: "[2;34m",
+            end: "[0m"
+        },
+        "-":{
+            start: "[2;35m",
+            end: "[0m"
+        },
+        "░":{
+            start: "[2;33m",
+            end: "[0m"
+        },
+        "▒":{
+            start: "[2;36m[2;32m",
+            end: "[0m[2;36m[0m"
+        },
+        "█": {
+            start: "[2;30m",
+            end: "[0m"
+        }
+    }
+
+
+    //We make sure that you shouldn't do coloring overlaps
+    let colorInUse = false;
+    let currentSymbol = "";
+    let currentColor;
+
+    // Our result string
+    let coloredmap = "";
+    // Set of accepted characters - feel free to extend if there is more characters
+    let characterSetRegex = /[ ~\-░▒█]/;
+
+    for (let i = 0 ; i < map.length ; i++){
+
+        // If the charcter is different from the previous character and it's already doing coloring,
+        // end the coloring lol
+        if (colorInUse === true && map[i] !== currentSymbol){
+            coloredmap += `${ansiColorMapper[currentSymbol].end}`;
+            currentSymbol = map[i];
+            colorInUse = false;
+        }
+
+        // If nothing is being colored rn, start coloring
+        if (characterSetRegex.test(map[i]) && colorInUse === false){
+            currentSymbol = map[i];
+            colorInUse = true;
+            coloredmap += `${ansiColorMapper[map[i]].start}${map[i]}`;
+        }
+        else if (map[i] === " "){
+            currentSymbol = map[i];
+            colorInUse = true;
+            coloredmap += `${ansiColorMapper[map[i]].start}${map[i]}`;
+        } else { // Our catch all case wtf, if things are already being colored and
+            // the next character isn't diffrent from the currentSymbol
+            coloredmap += map[i];
+        }
+    }
+    //
+    // console.log(coloredmap);
+
+    return coloredmap;
+}
+
 function polarToPlanar(lat,lon){
     lat = Math.floor((lat+90)*10)
     lon = Math.floor((lon+180)*10)
@@ -698,7 +769,8 @@ client.on('interactionCreate', async (interaction) => {
         if(interaction.commandName == "checkmapcolor"){
             var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
             let mapText = drawMap(coords[0],coords[1],10)
-            interaction.reply("```ansi\n"+mapText+"\n```")
+            colorifyMap(mapText)
+            interaction.reply("```ansi\n"+colorifyMap(mapText)+"\n```")
         }
 
         if(interaction.commandName == "sleep"){
