@@ -112,7 +112,7 @@ function formatTime(time){
     return timeString;
 }
 
-class Modifier{
+class modifier{
     constructor(n){
         this.name = n;
         this.damage = 0; // flat rate damage done to body part when modifier is applied
@@ -127,7 +127,7 @@ class Modifier{
 
 }
 
-class Body{
+class body{
     constructor(){
         // Imported from spine.js file, because holy shit the datastructure is massive!
         this.spine = baseBody;
@@ -144,6 +144,26 @@ function healthTick(b,part){
         }
     }
     return b[part]
+}
+
+function deadCheck(b,part){
+    dead = false
+    if(part == null){
+        part = "spine"
+    }
+    for(var p in b[part]){
+        if(p != "hp" && p != "modifiers" && p != "required"){
+            var check = deadCheck(b[part],p)[0];
+            b[part] = check[0];
+            
+            if(parthp[b[part]] == 0 && b[part].required){
+                dead = true;
+            }else if(check[1]){
+                dead = true;
+            }
+        }
+    }
+    return [b[part],dead]
 }
 
 function parthp(part){
@@ -274,7 +294,7 @@ function applyModifier(bodyPart,targetPart,modifier){
     return bodyPart;
 }
 
-class Player{
+class player{
     constructor(id){
         // Player's discord id
         this.id = id;
@@ -290,7 +310,7 @@ class Player{
         this.daysAtSea = 0; // Player's time spent in the game
         this.constantTime = 0; // hours of time in game TOTAL (used for timekeeping)
         
-        this.body = new Body()
+        this.body = new body()
     }
 }
 
@@ -439,7 +459,7 @@ client.on('interactionCreate', async (interaction) => {
             if(interaction.commandName == "shatter"){
                 var bt = interaction.options.getString("bodypart");
                 var target = getUserFromMention(interaction.options.getString("target"));
-                var mod = new Modifier("shattered")
+                var mod = new modifier("shattered")
                 mod.damage = 50
                 players[target].body = applyModifier(players[target].body,bt,mod)
                 interaction.reply("you shattered <@"+target+">'s "+bt)
@@ -449,7 +469,7 @@ client.on('interactionCreate', async (interaction) => {
         if(interaction.commandName == "getlost"){
             interaction.reply(randomFromArray(lostMessages))
             // Generate the player properties mapped to their user id
-            players[pid] = new Player(pid);
+            players[pid] = new player(pid);
             save();
             return;
         }
@@ -473,9 +493,18 @@ client.on('interactionCreate', async (interaction) => {
             }else if(parseFloat(interaction.options.getString("hours"))+" " == "NaN "){
                 interaction.reply("that's not a number")
             }else{
-                passTime(pid,parseFloat(interaction.options.getString("hours")))
-                interaction.reply("you have slept "+interaction.options.getString("hours")+" hours");
-                save()
+                if(deadCheck(players[pid].body)[1]){
+                    interaction.reply("you died in your sleep :pensive:")
+                    players[pid] = null;
+                    delete players[pid];
+                    save();
+                    return
+                }else{
+                    passTime(pid,parseFloat(interaction.options.getString("hours")))
+                    interaction.reply("you have slept "+interaction.options.getString("hours")+" hours");
+                    save()
+                }
+                
             }
             
             return;
