@@ -19,15 +19,25 @@ var gods = ["246589957165023232","216465467806580737"]
 var items = {}
 
 function loadItems(){
-decks = {}
-fs.readdirSync("./items/").forEach(file => {
-    console.log("loading "+file);
-    items[file.split(".")[0]] = require("./items/"+file)
-    console.log(items[file.split(".")[0]].texture)
-});
+    fs.readdirSync("./items/").forEach(file => {
+        console.log("loading "+file);
+        items[file.split(".")[0]] = require("./items/"+file)
+        console.log(items[file.split(".")[0]].texture)
+    });
 }
 
 loadItems()
+
+var recipes = {}
+
+function loadrecipes(){
+    fs.readdirSync("./recipes/").forEach(file => {
+        console.log("loading "+file);
+        recipes[file.split(".")[0]] = require("./recipes/"+file)
+    });
+}
+
+loadrecipes()
 
 function getUserFromMention(mention) {
 	if (!mention) return false;
