@@ -28,6 +28,36 @@ fs.readdirSync("./items/").forEach(file => {
 
 loadItems()
 
+var hourToDescription = {
+    0:"night",
+    1:"night",
+    2:"night",
+    3:"early morning",
+    4:"early morning",
+    5:"morning",
+    7:"morning",
+    8:"morning",
+    9:"morning",
+    10:"morning",
+    11:"noon",
+    12:"afternoon",
+    13:"afternoon",
+    14:"afternoon",
+    15:"afternoon",
+    16:"twilight",
+    17:"evening",
+    18:"evening",
+    19:"evening",
+    20:"night",
+    21:"night",
+    22:"night",
+    23:"midnight",
+}
+
+function fuzzyTime(time){
+    return hourToDescription[Math.floor(time)];
+}
+
 /**
  * Format time into a human friendly format.
  * Take a time value, converts it into a formatted time string in hh:mm (am/pm) format.
@@ -367,6 +397,15 @@ c = new SlashCommandBuilder()
 commands.push(c)
 
 c = new SlashCommandBuilder()
+.setName('showitem')
+.setDescription('shows an item')
+.addStringOption(option =>
+    option.setName('item')
+        .setDescription('item to show')
+        .setRequired(true));
+commands.push(c)
+
+c = new SlashCommandBuilder()
 .setName('checktime')
 .setDescription('Checks the time.')
 
@@ -412,10 +451,18 @@ function randomFromArray(array){
 
 var lostMessages = [
     "great going, you decided to go cheap on a \"cruise\" and now you're in the pacific",
-    "perhaps that cheap airline was too good to be true after all, now you're lost at sea"
+    "perhaps that cheap airline was too good to be true after all, now you're lost at sea", "fuck",
+    "you fell off the cruise ship and they just kept going without you, good luck!",
+    "that vacation on Easter Island was a mistake, now you're lost at sea",
+    "Neptune himself has taken you to the sea, fuck you"
 ]
 
 client.on('messageCreate', (msg) => {
+    var pid = msg.member.id;
+
+    if(players[pid] != null){
+
+    }
 })
 
 client.on('interactionCreate', async (interaction) => {
@@ -428,6 +475,17 @@ client.on('interactionCreate', async (interaction) => {
         interaction.reply("you aren't lost at sea yet, try using `/getlost`")
         return;
     }else{
+
+        if(gods.includes(pid)){
+            if(interaction.commandName == "showitem"){
+                var i = interaction.options.getString("item");
+                if(items[i] != null)
+                    interaction.reply("```\n"+items[i].texture+"\n```")
+                else
+                    interaction.reply("that's not real, this game only contains real things")
+                return;
+            }
+        }
         if(interaction.commandName == "getlost"){
             interaction.reply(randomFromArray(lostMessages))
             // Generate the player properties mapped to their user id
@@ -437,7 +495,13 @@ client.on('interactionCreate', async (interaction) => {
         }
 
         if(interaction.commandName == "checktime"){
-            interaction.reply(formatTime(players[pid].time));
+            var t = players[pid].time;
+            if(players[pid].daysAtSea == 1){
+                interaction.reply(formatTime(t)+", "+fuzzyTime(t)+", "+players[pid].daysAtSea+" day at sea");
+            }else if(players[pid].daysAtSea > 1){
+                interaction.reply(formatTime(t)+", "+fuzzyTime(t)+", "+players[pid].daysAtSea+" days at sea");
+            }else
+                interaction.reply(formatTime(t)+", "+fuzzyTime(t));
             return;
         }
 

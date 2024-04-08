@@ -1,0 +1,5 @@
+{
+    "name":"fishing pole",
+    "texture": "                    \n             :.     \n           --  ...  \n         .=     ..  \n    ..  -:          \n       @.           \n     :-             \n    @.              \n  @@                \n #-                 \n                    ",
+    "recipe":["stick","stick","string"]
+}
