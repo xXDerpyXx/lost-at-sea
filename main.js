@@ -215,7 +215,7 @@ function getBodyPartHp(bodyPart){
  *
  * @param bodyPart Body part in question to get it's HP to parse.
  * */
-function parseBodyPartToString(bodyPart){
+function hpToString(bodyPart){
     let HP, softHP
     [HP, softHP] = getBodyPartHp(bodyPart)
     let percantageHP = Math.floor((HP/bodyPart.hp)*100)
@@ -275,7 +275,7 @@ function bodyToString(body,partName,layer,layerString){
     if(mods.length > 0){
         mods = " ("+mods+")"
     }
-    finalString = "["+partName + " <" + parseBodyPartToString(body[partName]) + ">"+mods+"]"+highlight;
+    finalString = "["+partName + " <" + hpToString(body[partName]) + ">"+mods+"]"+highlight;
 
     let partsDone = 0;
     let totalParts = getSubBodyPartCount(body[partName]);
