@@ -351,20 +351,29 @@ function bodyToString(body,partName,layer,layerString){
     return finalString
 }
 
-function applyModifier(b,targetPart,m){ //id of player, target part, modifier to be applied
-
-    for(let subBodyPart in b){
+/**
+ * Applies a given modifier to a target body part, starting the search from the base body part
+ * and its subsequent sub-bodyparts
+ * @param bodyPart Highest level body part to apply the Search in
+ * @param targetPart part which the modifier needs to find to be applied to
+ * @param modifier The modifier in question that needs to be applied
+ *
+ * @return bodyPart the base bodyPart, now modified from the function.
+ * */
+function applyModifier(bodyPart,targetPart,modifier){
+    for(let subBodyPart in bodyPart){
         // Check through every sub-body-part that body part has (exclude keys that aren't sub-body-parts ofc)
         if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
-            if(subBodyPart == targetPart){
-                b[subBodyPart].modifiers.push(m)
+            if(subBodyPart === targetPart){
+                // Body part found, apply the modifier!
+                bodyPart[subBodyPart].modifiers.push(modifier)
             }else{
-                b[subBodyPart] = applyModifier(b[subBodyPart],targetPart,m)
+                // Recursive case, perform your BFS until you find the body aprt
+                bodyPart[subBodyPart] = applyModifier(bodyPart[subBodyPart],targetPart,modifier)
             }
-            
         }
     }
-    return b;
+    return bodyPart;
 }
 
 class player{
