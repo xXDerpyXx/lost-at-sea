@@ -358,6 +358,21 @@ function passTime(id,hours){
     }
 }
 
+function getPlayerLocation(id){
+    let locationString = "";
+    // We round to 4dp
+    let latitude = players[id].latitude.toFixed(4);
+
+    if (latitude < 0){ // Account for negative latitude (aka south of the equator)
+        locationString += `Your location is (${-(latitude)}°S)`;
+    } else {
+        locationString += `Your location is (${latitude}°N)`;
+    }
+
+
+    return locationString;
+}
+
 var commands = [];
 
 var c = new SlashCommandBuilder()
@@ -419,6 +434,12 @@ c = new SlashCommandBuilder()
             .setDescription('who to shatter')
             .setRequired(true)
     );
+commands.push(c)
+
+c = new SlashCommandBuilder()
+    .setName('getlocation')
+    .setDescription("get the player's location on the map")
+
 commands.push(c)
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
@@ -556,6 +577,10 @@ client.on('interactionCreate', async (interaction) => {
 
         if (interaction.commandName === "use"){
             interaction.reply("This is just a test for now")
+        }
+        if (interaction.commandName === "getlocation"){
+            interaction.reply(""+getPlayerLocation(pid)+"")
+
         }
     }
 })
