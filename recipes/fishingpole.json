@@ -2,5 +2,6 @@
     "name":"craft fishing pole",
     "workstations":[],
     "ingredients":["stick","stick","string"],
-    "output":["fishingpole"]
+    "output":["fishingpole"],
+    "timeToCraft":0.25
   }
