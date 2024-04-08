@@ -419,6 +419,16 @@ c = new SlashCommandBuilder()
 
 commands.push(c)
 
+c = new SlashCommandBuilder()
+    .setName('use')
+    .setDescription("Use an item, and provide any other items it may require.")
+    .addStringOption(option =>
+        option.setName('item')
+            .setDescription('item to show')
+            .setRequired(true)
+    );
+commands.push(c)
+
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 (async () => {
@@ -527,6 +537,10 @@ client.on('interactionCreate', async (interaction) => {
             await interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
             await interaction.followUp("```\n* means the part is required, if hp reaches 0%, you instantly die```")
             return;
+        }
+
+        if (interaction.commandName === "use"){
+            interaction.reply("This is just a test for now")
         }
     }
 })

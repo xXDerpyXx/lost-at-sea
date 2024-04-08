@@ -16,6 +16,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/main.js" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -58,6 +61,8 @@
       <updated>1712516494061</updated>
       <workItem from="1712516495124" duration="6236000" />
       <workItem from="1712526757944" duration="763000" />
+      <workItem from="1712531567032" duration="1381000" />
+      <workItem from="1712600035890" duration="1405000" />
     </task>
     <servers />
   </component>
