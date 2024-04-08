@@ -324,6 +324,7 @@ class player{
 
         // Internal properties
         this.hunger = 100;
+        this.thirst = 100;
         this.sleep = 100;
 
         this.time = 12; //current time of day
@@ -333,12 +334,30 @@ class player{
     }
 }
 
+function passTime(id,hours){
+    players[id].time += hours;
+    if(players[id].time > 23){
+        players[id].time = 1;
+        players[id].daysAtSea+=1
+    }
+
+}
+
 var commands = [];
 
 var c = new SlashCommandBuilder()
 .setName('getlost')
 .setDescription('Gets you lost at sea.')
 
+commands.push(c)
+
+c = new SlashCommandBuilder()
+.setName('sleep')
+.setDescription('you go to sleep')
+.addStringOption(option =>
+    option.setName('hours')
+        .setDescription('hours to sleep (can include decimals)')
+        .setRequired(true));
 commands.push(c)
 
 c = new SlashCommandBuilder()
@@ -413,6 +432,12 @@ client.on('interactionCreate', async (interaction) => {
 
         if(interaction.commandName == "checktime"){
             interaction.reply(formatTime(players[pid].time));
+            return;
+        }
+
+        if(interaction.commandName == "sleep"){
+            passTime(pid,parseFloat(interaction.options.getString("hours")))
+            interaction.reply("you have slept "+interaction.options.getString("hours")+" hours");
             return;
         }
 
