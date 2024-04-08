@@ -365,6 +365,7 @@ class player{
 
         this.time = 12; //current time of day
         this.daysAtSea = 0; // Player's time spent in the game
+        this.constantTime = 0; // hours of time in game TOTAL (used for timekeeping)
         
         this.body = new body()
     }
@@ -372,6 +373,7 @@ class player{
 
 function passTime(id,hours){
     players[id].time += hours;
+    players[id].constantTime += hours;
     if(players[id].time > 24){
         players[id].time -= 24;
         players[id].daysAtSea+=1
