@@ -333,11 +333,22 @@ function bodyToString(body,partName,layer,layerString){
     }
 
     // Highlight if the part is required for survival!
+    var highlight = ""
     if (body[partName].required !== undefined && body[partName].required === true){
-        finalString = "["+partName + " <" + parthpString(body[partName]) + ">] *";
-    } else {
-        finalString = "["+partName + " <" + parthpString(body[partName]) + ">]";
+        highlight = " *"
     }
+    var mods = ""
+    for(var i = 0; i < body[partName].modifiers.length; i++){
+        mods += body[partName].modifiers[i].name
+        if(i < body[partName].modifiers.length-1){
+            mods +=", "
+        }
+    }
+
+    if(mods.length > 0){
+        mods = " ("+mods+")"
+    }
+    finalString = "["+partName + " <" + parthpString(body[partName]) + ">"+mods+"]"+highlight;
 
     let partsDone = 0;
     let totalParts = subPartCount(body[partName]);
