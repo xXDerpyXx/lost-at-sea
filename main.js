@@ -134,6 +134,26 @@ class Body{
     }
 }
 
+class Player{
+    constructor(id){
+        // Player's discord id
+        this.id = id;
+        // When the player first starts the game, set their latitude randomly near the equator
+        this.latitude = (Math.random()*20)-10
+
+        // Internal properties
+        this.hunger = 100;
+        this.thirst = 100;
+        this.sleep = 100;
+
+        this.time = 12; //current time of day
+        this.daysAtSea = 0; // Player's time spent in the game
+        this.constantTime = 0; // hours of time in game TOTAL (used for timekeeping)
+
+        this.body = new Body()
+    }
+}
+
 function healthTick(b,part){
     if(part == null){
         part = "spine"
@@ -164,22 +184,21 @@ function parthp(part){
     return [hp,softHp];
 }
 
-function parthpString(part){
-    var hp = parthp(part)
-    var percentage = Math.floor((hp[0]/part.hp)*100)
-    var softPercentage = Math.floor((hp[1]/part.hp)*100)
+function parthpString(bodyPart){
+    var hp = parthp(bodyPart)
+    var percentage = Math.floor((hp[0]/bodyPart.hp)*100)
+    var softPercentage = Math.floor((hp[1]/bodyPart.hp)*100)
     if(percentage == softPercentage){
         return percentage+"%"
     }else{
         return softPercentage+"% ("+percentage+"%)"
     }
-
 }
 
-function subPartCount(part){
-    count = 0;
-    for(var p in part){
-        if(p != "hp" && p != "modifiers" && p != "required"){
+function subPartCount(bodyPart){
+    count = 0; // Where we build the result
+    for(var subBodyPartKey in bodyPart){
+        if(subBodyPartKey !== "hp" && subBodyPartKey !== "modifiers" && subBodyPartKey !== "required"){
             count++
         }
     }
@@ -274,34 +293,21 @@ function applyModifier(bodyPart,targetPart,modifier){
     return bodyPart;
 }
 
-class Player{
-    constructor(id){
-        // Player's discord id
-        this.id = id;
-        // When the player first starts the game, set their latitude randomly near the equator
-        this.latitude = (Math.random()*20)-10
 
-        // Internal properties
-        this.hunger = 100;
-        this.thirst = 100;
-        this.sleep = 100;
-
-        this.time = 12; //current time of day
-        this.daysAtSea = 0; // Player's time spent in the game
-        this.constantTime = 0; // hours of time in game TOTAL (used for timekeeping)
-        
-        this.body = new Body()
-    }
-}
-
+/**
+ * Increment the time passed relative to a certain player
+ * @param id user's discord id
+ * @param hours how many hours you want to increment
+ * */
 function passTime(id,hours){
     players[id].time += hours;
     players[id].constantTime += hours;
+
+    // Account for hours
     if(players[id].time > 24){
         players[id].time -= 24;
         players[id].daysAtSea+=1
     }
-
 }
 
 var commands = [];
