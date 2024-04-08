@@ -351,6 +351,22 @@ function bodyToString(body,partName,layer,layerString){
     return finalString
 }
 
+function applyModifier(b,targetPart,m){ //id of player, target part, modifier to be applied
+
+    for(let subBodyPart in b){
+        // Check through every sub-body-part that body part has (exclude keys that aren't sub-body-parts ofc)
+        if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
+            if(subBodyPart == targetPart){
+                b[subBodyPart].modifiers.push(m)
+            }else{
+                b[subBodyPart] = applyModifier(b[subBodyPart],targetPart,m)
+            }
+            
+        }
+    }
+    return b;
+}
+
 class player{
     constructor(id){
         // Player's discord id
