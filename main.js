@@ -35,25 +35,31 @@ loadItems()
 function formatTime(time){
     // Our result string
     var timeString = "";
-
+    console.log(time)
     var suffix = "am"
-    var parts = toString(time).split(".")
+    var parts = [];
     // No decimal point time
-    if(!toString(time).includes(".")){
+    if(parseInt(time) == parseFloat(time)){
         parts[0] = time;
         parts[1] = "0"
+    }else{
+        parts = time.toString().split(".")
     }
     
-    parts[0] = parseInt(parts[0])+1
-    console.log(parts[0])
+    parts[0] = parseFloat(parts[0])+1
+    console.log(parts)
 
     // Check if afternoon
     if(parts[0] > 12){
         suffix = "pm"
         parts[0] = parts[0]-12
     }
+    if(parts[1].length == 1){
+        parts[1] += "0"
+    }
 
-    parts[1] = (parseInt(parts[1])/100)*60
+    parts[1] = ((parseInt(parts[1])/100)*60)
+    console.log(parts[1])
     if(parts[1] < 10){
         parts[1] = "0"+parts[1]
     }
@@ -336,8 +342,8 @@ class player{
 
 function passTime(id,hours){
     players[id].time += hours;
-    if(players[id].time > 23){
-        players[id].time = 1;
+    if(players[id].time > 24){
+        players[id].time -= 24;
         players[id].daysAtSea+=1
     }
 
@@ -436,8 +442,18 @@ client.on('interactionCreate', async (interaction) => {
         }
 
         if(interaction.commandName == "sleep"){
-            passTime(pid,parseFloat(interaction.options.getString("hours")))
-            interaction.reply("you have slept "+interaction.options.getString("hours")+" hours");
+            if(parseFloat(interaction.options.getString("hours")) > 24){
+                interaction.reply("you cant sleep for more than 24 hours at a time")
+            }else if(parseFloat(interaction.options.getString("hours")) < 0){
+                interaction.reply("you cant unsleep")
+            }else if(parseFloat(interaction.options.getString("hours"))+" " == "NaN "){
+                interaction.reply("that's not a number")
+            }else{
+                passTime(pid,parseFloat(interaction.options.getString("hours")))
+                interaction.reply("you have slept "+interaction.options.getString("hours")+" hours");
+                save()
+            }
+            
             return;
         }
 
