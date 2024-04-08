@@ -29,6 +29,20 @@ fs.readdirSync("./items/").forEach(file => {
 
 loadItems()
 
+function getUserFromMention(mention) {
+	if (!mention) return false;
+
+	if (mention.startsWith('<@') && mention.endsWith('>')) {
+		mention = mention.slice(2, -1);
+
+		if (mention.startsWith('!')) {
+			mention = mention.slice(1);
+		}
+
+		return mention;
+	}
+}
+
 var hourToDescription = {
     0:"night",
     1:"night",
@@ -138,10 +152,13 @@ function parthp(part){
     for(var k in part.modifiers){
         hp -= part.modifiers[k].damage
         softHp -= part.modifiers[k].damage
-        softHp -= part.modifiers[k].softDamagedamage
+        softHp -= part.modifiers[k].softDamage
     }
     if(hp < 0){
         hp = 0;
+    }
+    if(softHp < 0){
+        softHp = 0;
     }
 
     return [hp,softHp];
@@ -324,6 +341,21 @@ c = new SlashCommandBuilder()
     );
 commands.push(c)
 
+c = new SlashCommandBuilder()
+    .setName('shatter')
+    .setDescription("shatters bones")
+    .addStringOption(option =>
+        option.setName('bodypart')
+            .setDescription('part to shatter')
+            .setRequired(true)
+    )
+    .addStringOption(option =>
+        option.setName('target')
+            .setDescription('who to shatter')
+            .setRequired(true)
+    );
+commands.push(c)
+
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 (async () => {
@@ -391,6 +423,16 @@ client.on('interactionCreate', async (interaction) => {
                 else
                     interaction.reply("that's not real, this game only contains real things")
                 return;
+            }
+
+            if(interaction.commandName == "shatter"){
+                var bt = interaction.options.getString("bodypart");
+                var target = getUserFromMention(interaction.options.getString("target"));
+                var mod = new modifier("shattered")
+                mod.damage = 50
+                players[target].body = applyModifier(players[target].body,bt,mod)
+                interaction.reply("you shattered <@"+target+">'s "+bt)
+                save();
             }
         }
         if(interaction.commandName == "getlost"){
