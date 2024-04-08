@@ -1,0 +1,6 @@
+{
+    "name":"craft fishing pole",
+    "workstations":[],
+    "ingredients":["stick","stick","string"],
+    "output":["fishingpole"]
+  }
