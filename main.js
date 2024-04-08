@@ -1,4 +1,5 @@
 var TOKEN = require("./token.js");
+const baseBody = require("./spine")
 var CLIENT_ID = "738108203505549342"
 var fs = require("fs")
 
@@ -128,139 +129,8 @@ class modifier{
 
 class body{
     constructor(){
-        this.spine = {
-            hp:10,
-            modifiers:[],
-            chest:{
-                hp:10,
-                modifiers:[],
-                required:true,
-                neck:{
-                    hp:8,
-                    modifiers:[],
-                    required:true,
-                    head:{
-                        hp:10,
-                        modifiers:[],
-                        required:true,
-                        skull:{
-                            hp:10,
-                            modifiers:[],
-                            brain:{
-                                hp:10,
-                                modifiers:[],
-                                required:true
-                            }
-                        },
-                        leftEye:{hp:5,modifiers:[]},
-                        rightEye:{hp:5,modifiers:[]},
-                        leftEar:{hp:5,modifiers:[]},
-                        rightEar:{hp:5,modifiers:[]},
-                        mouth:{
-                            hp:5,
-                            modifiers:[],
-                            tongue:{hp:3,modifiers:[]},
-                            upperTeeth:{hp:5,modifiers:[]},
-                            lowerTeeth:{hp:5,modifiers:[]}
-                        },
-                        nose:{hp:5,modifiers:[]}
-                    }
-                },
-                leftShoulder:{
-                    hp:7,
-                    modifiers:[],
-                    leftUpperArm:{
-                        hp:5,
-                        modifiers:[],
-                        leftLowerArm:{
-                            hp:5,
-                            modifiers:[],
-                            leftHand:{
-                                hp:5,
-                                modifiers:[],
-                                leftThumb:{hp:3,modifiers:[]},
-                                leftIndexFinger:{hp:3,modifiers:[]},
-                                leftMiddleFinger:{hp:2,modifiers:[]},
-                                leftRingFinger:{hp:2,modifiers:[]},
-                                leftPinkyFinger:{hp:1,modifiers:[]}
-                            }
-                        }
-                    }
-                },
-                rightShoulder:{
-                    hp:7,
-                    modifiers:[],
-                    rightUpperArm:{
-                        hp:5,
-                        modifiers:[],
-                        rightLowerArm:{
-                            hp:5,
-                            modifiers:[],
-                            rightHand:{
-                                hp:5,
-                                modifiers:[],
-                                rightThumb:{hp:3,modifiers:[]},
-                                rightIndexFinger:{hp:3,modifiers:[]},
-                                rightMiddleFinger:{hp:2,modifiers:[]},
-                                rightRingFinger:{hp:1,modifiers:[]},
-                                rightPinkyFinger:{hp:1,modifiers:[]}
-                            }
-                        }
-                    }
-                },
-                heart:{
-                    hp:7,
-                    modifiers:[],
-                    required:true
-                },
-                leftLung:{hp:5,modifiers:[]},
-                rightLung:{hp:5,modifiers:[]},
-                stomach:{hp:5,modifiers:[]},
-                liver:{hp:5,modifiers:[]}
-            },
-            lowerTorso:{
-                hp:10,
-                modifiers:[],
-                required:true,
-                leftUpperLeg:{
-                    hp:7,
-                    modifiers:[],
-                    leftLowerLeg:{
-                        hp:7,
-                        modifiers:[],
-                        leftFoot:{
-                            hp:5,
-                            modifiers:[],
-                            leftFirstToe:{hp:3,modifiers:[]},
-                            leftSecondToe:{hp:3,modifiers:[]},
-                            leftThirdToe:{hp:2,modifiers:[]},
-                            leftFourthToe:{hp:2,modifiers:[]},
-                            leftFifthToe:{hp:1,modifiers:[]}
-                        }
-                    }
-                },
-                rightUpperLeg:{
-                    hp:7,
-                    modifiers:[],
-                    rightLowerLeg:{
-                        hp:7,
-                        modifiers:[],
-                        rightFoot:{
-                            hp:5,
-                            modifiers:[],
-                            rightFirstToe:{hp:3,modifiers:[]},
-                            rightSecondToe:{hp:3,modifiers:[]},
-                            rightThirdToe:{hp:2,modifiers:[]},
-                            rightFourthToe:{hp:2,modifiers:[]},
-                            rightFifthToe:{hp:1,modifiers:[]}
-                        }
-                    }
-                },
-                intestines:{hp:5,modifiers:[]},
-                leftKidney:{hp:5,modifiers:[]},
-                rightKidney:{hp:5,modifiers:[]}
-            }
-        }
+        // Imported from spine.js file, because holy shit the datastructure is massive!
+        this.spine = baseBody;
     }
 }
 
