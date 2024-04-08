@@ -30,14 +30,14 @@ loadItems()
 
 var recipes = {}
 
-function loadrecipes(){
+function loadRecipes(){
     fs.readdirSync("./recipes/").forEach(file => {
         console.log("loading "+file);
         recipes[file.split(".")[0]] = require("./recipes/"+file)
     });
 }
 
-loadrecipes()
+loadRecipes()
 
 function getUserFromMention(mention) {
 	if (!mention) return false;
