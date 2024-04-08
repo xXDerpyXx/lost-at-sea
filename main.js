@@ -374,9 +374,9 @@ function getPlayerLocation(id){
     }
 
     if (latitude < 0){ // Account for negative longitude
-        latsuffix = "°W"
+        lonsuffix = "°W"
     } else {
-        latsuffix = "°E"
+        lonsuffix = "°E"
     }
 
     locationString += `Your location is (`+latitude+latsuffix+", "+longitude+lonsuffix+`)`;
