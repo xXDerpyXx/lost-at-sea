@@ -171,15 +171,16 @@ function deadCheck(b,part){
     if(part == null){
         part = "spine"
     }
-    for(var p in b[part]){
+    if(parthp(b)[0] == 0 && b.required){
+        dead = true;
+        return [b[part],dead]
+    }
+    for(var p in b){
         if(p != "hp" && p != "modifiers" && p != "required"){
-            var check = deadCheck(b[part],p)[0];
-            b[part] = check[0];
-            
-            if(parthp[b[part]] == 0 && b[part].required){
+            var check = deadCheck(b[p],p);
+            if(check[1]){
                 dead = true;
-            }else if(check[1]){
-                dead = true;
+                return [b[part],dead]
             }
         }
     }
