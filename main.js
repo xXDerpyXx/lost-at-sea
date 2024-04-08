@@ -484,6 +484,10 @@ client.on('interactionCreate', async (interaction) => {
                 var bt = interaction.options.getString("bodypart");
                 var target = getUserFromMention(interaction.options.getString("target"));
                 var mod = new modifier("shattered")
+                if(players[target] == null){
+                    interaction.reply("they do not exist")
+                    return;
+                }
                 mod.damage = 50
                 players[target].body = applyModifier(players[target].body,bt,mod)
                 interaction.reply("you shattered <@"+target+">'s "+bt)
