@@ -1,6 +1,6 @@
 // HOLY GUACAMOLE THIS IS ONE MASSIVE ASS BODY DATASTRUCTURE
 
-body = {spine:{
+body = {
     hp:10,
         modifiers:[],
     chest:{
@@ -133,5 +133,5 @@ body = {spine:{
         rightKidney:{hp:5,modifiers:[]}
     }
 }
-}
+
 module.exports = body
