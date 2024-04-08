@@ -165,6 +165,111 @@ class player{
     }
 }
 
+map = []
+
+function oob(x,y){
+    if(x > 0 && x < 3600 && y > 0 && y < 1800){
+        return false;
+    }
+    return true;
+}
+
+function generateMap(){
+    var width = 3600
+    var height = 1800
+    var smoothness = 2
+    var seaLevel = 105
+    var m = []
+    console.log("map generating")
+    for(var x = 0; x < width; x++){
+        m[x] = []
+        for(var y = 0; y < height; y++){
+            m[x][y] = {
+                elevation:110-(Math.random()*11),
+                tileChar:"~",
+                land:false,
+                reef:false
+            }
+        }
+    }
+    console.log("smoothing terrain")
+
+    for(var k = 0; k < smoothness; k++){
+        for(var x = 0; x < width; x++){
+            for(var y = 0; y < height; y++){
+                var avg = 0
+                var tiles = 0
+                for(var i = -1; i < 2; i++){
+                    for(var j = -1; j < 2; j++){
+                        if(!oob(x+i,y+j)){
+                            tiles++;
+                            avg += m[x+i][y+j].elevation
+                        }
+                    }
+                }
+                m[x][y].elevation = avg/tiles
+            }
+        }
+    }
+    console.log("generating textures")
+    for(var x = 0; x < width; x++){
+        for(var y = 0; y < height; y++){
+            if(m[x][y].elevation <= seaLevel){
+                if(m[x][y].reef){
+                    m[x][y].tileChar = "-"
+                }else
+                    m[x][y].tileChar = "~"
+            }else if(m[x][y].elevation <= seaLevel+1){
+                m[x][y].tileChar = "░"
+                m[x][y].land = true;
+            }else if(m[x][y].elevation <= seaLevel+2){
+                m[x][y].tileChar = "▒"
+                m[x][y].land = true;
+            }else if(m[x][y].elevation <= seaLevel+3){
+                m[x][y].tileChar = "▓"
+                m[x][y].land = true;
+            }else{
+                m[x][y].tileChar = "█"
+                m[x][y].land = true;
+            }
+            
+
+        }
+    }
+
+    console.log("map complete")
+    return m;
+}
+
+
+
+function dist(ax,ay,bx,by){
+    return Math.sqrt(((ax-bx)*(ax-bx))+((ay-by)*(ay-by)))
+}
+
+function drawMap(x,y,radius){
+    var output = "";
+    for(var i = x-radius; i < x+radius; i++){
+        for(var j = y-radius; j < y+radius; j++){
+            if(!oob(i,j)){
+                if(dist(x,y,i,j) <= radius-1){
+                    output += map[i][j].tileChar;
+                }else
+                    output += " "
+            }else
+                output += " "
+        }
+        output +="\n"
+    }
+    return output;
+}
+
+function polarToPlanar(lat,lon){
+    lat = Math.floor((lat+90)*10)
+    lon = Math.floor((lon+180)*10)
+    return [lat,lon]
+}
+
 
 function healthTick(b,part){
     if(part == null){
@@ -424,6 +529,12 @@ c = new SlashCommandBuilder()
 commands.push(c)
 
 c = new SlashCommandBuilder()
+.setName('checkmap')
+.setDescription('Checks your local area.')
+
+commands.push(c)
+
+c = new SlashCommandBuilder()
     .setName('use')
     .setDescription("Use an item, and provide any other items it may require.")
     .addStringOption(option =>
@@ -451,6 +562,12 @@ commands.push(c)
 c = new SlashCommandBuilder()
     .setName('checklocation')
     .setDescription("get the player's location on the map")
+
+commands.push(c)
+
+c = new SlashCommandBuilder()
+    .setName('regenmap')
+    .setDescription("regenerates the map")
 
 commands.push(c)
 
@@ -502,6 +619,10 @@ client.on('messageCreate', (msg) => {
     }
 })
 
+client.on('ready',()=>{
+    map = generateMap();
+})
+
 client.on('interactionCreate', async (interaction) => {
 
     if (!interaction.isChatInputCommand()) return;
@@ -522,6 +643,13 @@ client.on('interactionCreate', async (interaction) => {
                     interaction.reply("that's not real, this game only contains real things")
                 return;
             }
+
+            if(interaction.commandName == "regenmap"){
+                interaction.reply("the world has been erased then remade")
+                map = generateMap();
+            }
+
+            
 
             if(interaction.commandName == "shatter"){
                 var bt = interaction.options.getString("bodypart");
@@ -554,6 +682,11 @@ client.on('interactionCreate', async (interaction) => {
             }else
                 interaction.reply(formatTime(t)+", "+fuzzyTime(t));
             return;
+        }
+
+        if(interaction.commandName == "checkmap"){
+            var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
+            interaction.reply("```\n"+drawMap(coords[0],coords[1],10)+"\n```")
         }
 
         if(interaction.commandName == "sleep"){
