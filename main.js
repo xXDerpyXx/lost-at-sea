@@ -535,6 +535,12 @@ c = new SlashCommandBuilder()
 commands.push(c)
 
 c = new SlashCommandBuilder()
+    .setName('checkmapcolor')
+    .setDescription('Checks your local area, but in color')
+
+commands.push(c)
+
+c = new SlashCommandBuilder()
     .setName('use')
     .setDescription("Use an item, and provide any other items it may require.")
     .addStringOption(option =>
@@ -687,6 +693,12 @@ client.on('interactionCreate', async (interaction) => {
         if(interaction.commandName == "checkmap"){
             var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
             interaction.reply("```\n"+drawMap(coords[0],coords[1],10)+"\n```")
+        }
+
+        if(interaction.commandName == "checkmapcolor"){
+            var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
+            let mapText = drawMap(coords[0],coords[1],10)
+            interaction.reply("```ansi\n"+mapText+"\n```")
         }
 
         if(interaction.commandName == "sleep"){
