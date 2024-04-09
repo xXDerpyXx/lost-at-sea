@@ -1,5 +1,6 @@
 var TOKEN = require("./token.js");
 const baseBody = require("./spine")
+const commands = require("./commandBuilder")
 var CLIENT_ID = "738108203505549342"
 var fs = require("fs")
 
@@ -750,128 +751,132 @@ function getPlayerLocation(id){
 }
 
 /**
- * Return miles into kilometers rounded to 4dp
+ * Return miles into kilometers rounded to 2dp
  * */
 function mileToKm(miles){
     return (miles * 1.609).toFixed(2);
 }
 
-var commands = [];
+// var commands = [];
+//
+// var c = new SlashCommandBuilder()
+// .setName('getlost')
+// .setDescription('Gets you lost at sea.')
+//
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+// .setName('sleep')
+// .setDescription('you go to sleep')
+// .addStringOption(option =>
+//     option.setName('hours')
+//         .setDescription('hours to sleep (can include decimals)')
+//         .setRequired(true));
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+// .setName('showitem')
+// .setDescription('shows an item')
+// .addStringOption(option =>
+//     option.setName('item')
+//         .setDescription('item to show')
+//         .setRequired(true));
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+// .setName('checktime')
+// .setDescription('Checks the time.')
+//
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+// .setName('checkbody')
+// .setDescription('Checks your body.')
+//
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+// .setName('checkmap')
+// .setDescription('Checks your local area.')
+//
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+//     .setName('checkmapcolor')
+//     .setDescription('Checks your local area, but in color')
+//
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+//     .setName('use')
+//     .setDescription("Use an item, and provide any other items it may require.")
+//     .addStringOption(option =>
+//         option.setName('item')
+//             .setDescription('item to show')
+//             .setRequired(true)
+//     );
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+//     .setName('shatter')
+//     .setDescription("shatters bones")
+//     .addStringOption(option =>
+//         option.setName('bodypart')
+//             .setDescription('part to shatter')
+//             .setRequired(true)
+//     )
+//     .addStringOption(option =>
+//         option.setName('target')
+//             .setDescription('who to shatter')
+//             .setRequired(true)
+//     );
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+//     .setName('swim')
+//     .setDescription("lets you swim")
+//     .addStringOption(option =>
+//         option.setName('lateral')
+//             .setDescription('lattitude to travel (in miles, positive for north, negative for south)')
+//             .setRequired(true)
+//     )
+//     .addStringOption(option =>
+//         option.setName('longitudinal')
+//             .setDescription('longitude to travel (in miles, positive for east, negative for west)')
+//             .setRequired(true)
+//     );
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+//     .setName('checklocation')
+//     .setDescription("get the player's location on the map")
+//
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+//     .setName('regenmap')
+//     .setDescription("regenerates the map")
+//
+// commands.push(c)
+//
+// c = new SlashCommandBuilder()
+//     .setName('teleport')
+//     .setDescription("Teleport Players to specific latitude and longitude")
+//     .addStringOption(option =>
+//         option.setName('latitude')
+//             .setDescription('lattitude to travel (Negative values for south of the equator)')
+//             .setRequired(true)
+//     )
+//     .addStringOption(option =>
+//         option.setName('longitude')
+//             .setDescription('longitude to travel (Negative Values for West of the prime meridian)')
+//             .setRequired(true)
+//     );
+//
+// commands.push(c)
 
-var c = new SlashCommandBuilder()
-.setName('getlost')
-.setDescription('Gets you lost at sea.')
 
-commands.push(c)
-
-c = new SlashCommandBuilder()
-.setName('sleep')
-.setDescription('you go to sleep')
-.addStringOption(option =>
-    option.setName('hours')
-        .setDescription('hours to sleep (can include decimals)')
-        .setRequired(true));
-commands.push(c)
-
-c = new SlashCommandBuilder()
-.setName('showitem')
-.setDescription('shows an item')
-.addStringOption(option =>
-    option.setName('item')
-        .setDescription('item to show')
-        .setRequired(true));
-commands.push(c)
-
-c = new SlashCommandBuilder()
-.setName('checktime')
-.setDescription('Checks the time.')
-
-commands.push(c)
-
-c = new SlashCommandBuilder()
-.setName('checkbody')
-.setDescription('Checks your body.')
-
-commands.push(c)
-
-c = new SlashCommandBuilder()
-.setName('checkmap')
-.setDescription('Checks your local area.')
-
-commands.push(c)
-
-c = new SlashCommandBuilder()
-    .setName('checkmapcolor')
-    .setDescription('Checks your local area, but in color')
-
-commands.push(c)
-
-c = new SlashCommandBuilder()
-    .setName('use')
-    .setDescription("Use an item, and provide any other items it may require.")
-    .addStringOption(option =>
-        option.setName('item')
-            .setDescription('item to show')
-            .setRequired(true)
-    );
-commands.push(c)
-
-c = new SlashCommandBuilder()
-    .setName('shatter')
-    .setDescription("shatters bones")
-    .addStringOption(option =>
-        option.setName('bodypart')
-            .setDescription('part to shatter')
-            .setRequired(true)
-    )
-    .addStringOption(option =>
-        option.setName('target')
-            .setDescription('who to shatter')
-            .setRequired(true)
-    );
-commands.push(c)
-
-c = new SlashCommandBuilder()
-    .setName('swim')
-    .setDescription("lets you swim")
-    .addStringOption(option =>
-        option.setName('lateral')
-            .setDescription('lattitude to travel (in miles, positive for north, negative for south)')
-            .setRequired(true)
-    )
-    .addStringOption(option =>
-        option.setName('longitudinal')
-            .setDescription('longitude to travel (in miles, positive for east, negative for west)')
-            .setRequired(true)
-    );
-commands.push(c)
-
-c = new SlashCommandBuilder()
-    .setName('checklocation')
-    .setDescription("get the player's location on the map")
-
-commands.push(c)
-
-c = new SlashCommandBuilder()
-    .setName('regenmap')
-    .setDescription("regenerates the map")
-
-commands.push(c)
-
-c = new SlashCommandBuilder()
-    .setName('teleport')
-    .setDescription("Teleport Players to specific latitude and longitude")
-    .addStringOption(option =>
-        option.setName('latitude')
-            .setDescription('lattitude to travel (Negative values for south of the equator)')
-            .setRequired(true)
-    )
-    .addStringOption(option =>
-        option.setName('longitude')
-            .setDescription('longitude to travel (Negative Values for West of the prime meridian)')
-            .setRequired(true)
-    );
-
+console.log(commands)
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
