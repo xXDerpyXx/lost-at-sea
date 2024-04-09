@@ -338,7 +338,7 @@ function colorifyMap(map){
 function polarToPlanar(lat,lon){
     lat = Math.floor((lat+90)*10)
     lon = Math.floor((lon+180)*10)
-    return [lat,lon]
+    return [lon,lat]
 }
 
 
