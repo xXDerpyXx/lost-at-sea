@@ -837,6 +837,21 @@ c = new SlashCommandBuilder()
 
 commands.push(c)
 
+c = new SlashCommandBuilder()
+    .setName('teleport')
+    .setDescription("Teleport Players to specific latitude and longitude")
+    .addStringOption(option =>
+        option.setName('latitude')
+            .setDescription('lattitude to travel (Negative values for south of the equator)')
+            .setRequired(true)
+    )
+    .addStringOption(option =>
+        option.setName('longitude')
+            .setDescription('longitude to travel (Negative Values for West of the prime meridian)')
+            .setRequired(true)
+    );
+
+
 const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 (async () => {
@@ -1043,8 +1058,16 @@ client.on('interactionCreate', async (interaction) => {
         }
         if (interaction.commandName === "checklocation"){
             interaction.reply(""+getPlayerLocation(pid)+"")
+        }
+        if (interaction.commandName === "teleport"){
+            const latitude = parseFloat(interaction.options.getString("latitude"))
+            const longitude = parseFloat(interaction.options.getString("longitude"))
+            players[pid].latitude = latitude
+            players[pid].longitude = longitude
+            interaction.reply(""+getPlayerLocation(pid)+"")
 
         }
+
     }
 })
 
