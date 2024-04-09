@@ -516,6 +516,19 @@ function polarToPlanar(lat,lon){
     return [lon,lat]
 }
 
+function adjustForCurve(lat,lon){
+    while(lat > 90)
+        lat-=180
+    while(lat < -90)
+        lat+=180
+
+    while(lon > 180)
+        lon-=360
+    while(lon < -918)
+        lon+=360
+    return [lat,lon]
+}
+
 
 function healthTick(b,part){
     if(part == null){
@@ -948,7 +961,15 @@ client.on('interactionCreate', async (interaction) => {
                 save()
             }
 
-            
+            if (interaction.commandName === "teleport"){
+                const latitude = parseFloat(interaction.options.getString("latitude"))
+                const longitude = parseFloat(interaction.options.getString("longitude"))
+                players[pid].latitude = latitude
+                players[pid].longitude = longitude
+                players[pid].latitude,players[pid].longitude = adjustForCurve(players[pid].latitude,players[pid].longitude)
+                interaction.reply(""+getPlayerLocation(pid)+"")
+    
+            }            
 
             if(interaction.commandName == "shatter"){
                 var bt = interaction.options.getString("bodypart");
@@ -998,6 +1019,7 @@ client.on('interactionCreate', async (interaction) => {
             var timeTaken = (distance*100)*(1/players[pid].swimmingSpeed)
             players[pid].longitude += plon
             players[pid].latitude -= plat
+            players[pid].latitude,players[pid].longitude = adjustForCurve(players[pid].latitude,players[pid].longitude)
             passTime(pid,timeTaken)
             if(deadCheck(players[pid].body)[1]){
                 interaction.reply("you died while swimming")
@@ -1064,14 +1086,7 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.commandName === "checklocation"){
             interaction.reply(""+getPlayerLocation(pid)+"")
         }
-        if (interaction.commandName === "teleport"){
-            const latitude = parseFloat(interaction.options.getString("latitude"))
-            const longitude = parseFloat(interaction.options.getString("longitude"))
-            players[pid].latitude = latitude
-            players[pid].longitude = longitude
-            interaction.reply(""+getPlayerLocation(pid)+"")
-
-        }
+        
 
     }
 })
