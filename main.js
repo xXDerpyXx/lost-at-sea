@@ -960,14 +960,14 @@ client.on('interactionCreate', async (interaction) => {
                 mod.damage = 50
                 players[target].body = applyModifier(players[target].body,bt,mod)
                 interaction.reply("you shattered <@"+target+">'s "+bt)
-                save();
+                save(false);
             }
         }
         if(interaction.commandName == "getlost"){
             interaction.reply(randomFromArray(lostMessages))
             // Generate the player properties mapped to their user id
             players[pid] = new player(pid);
-            save();
+            save(false);
             return;
         }
 
@@ -998,6 +998,10 @@ client.on('interactionCreate', async (interaction) => {
             players[pid].longitude += plon
             players[pid].latitude -= plat
             passTime(pid,timeTaken)
+            if(deadCheck(players[pid].body)){
+                interaction.reply("you died while swimming")
+                return;
+            }
             interaction.reply("you traveled "+(distance*100).toFixed(2)+" miles, and it took "+formatLengthOfTime(timeTaken))
             save(false)
             return;
@@ -1034,12 +1038,12 @@ client.on('interactionCreate', async (interaction) => {
                     interaction.reply("you died in your sleep :pensive:")
                     players[pid] = null;
                     delete players[pid];
-                    save();
+                    save(false);
                     return
                 }else{
                     passTime(pid,parseFloat(interaction.options.getString("hours")))
                     interaction.reply("you have slept "+interaction.options.getString("hours")+" hours");
-                    save()
+                    save(false)
                 }
                 
             }
