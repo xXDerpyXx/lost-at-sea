@@ -534,7 +534,6 @@ function deadCheck(b,part){
     if(part == null){
         part = "spine"
     }
-    console.log(part)
     if(getBodyPartHp(b)[0] == 0 && b.required){
         dead = true;
         return [b[part],dead]
