@@ -876,67 +876,67 @@ function mileToKm(miles){
 //
 // commands.push(c)
 
-var c;
-
-c = new SlashCommandBuilder()
-    .setName('applydamage')
-    .setDescription("applies custom damage modifiers to any target")
-    .addStringOption(option =>
-        option.setName('bodypart')
-            .setDescription('part to modify')
-            .setRequired(true)
-    )
-    .addStringOption(option =>
-        option.setName('target')
-            .setDescription('who to modify')
-            .setRequired(true)
-    )
-    .addStringOption(option =>
-        option.setName('name')
-            .setDescription('name of injury/disease')
-            .setRequired(false)
-    )
-    .addNumberOption(option =>
-        option.setName('damage')
-            .setDescription('raw damage caused to the part it\'s applied to')
-            .setRequired(false)
-    )
-    .addNumberOption(option =>
-        option.setName('growth')
-            .setDescription('rate of progression')
-            .setRequired(false)
-    )
-    .addStringOption(option =>
-        option.setName('stage')
-            .setDescription('stage of the injury/disease')
-            .setRequired(false)
-    )
-    .addBooleanOption(option =>
-        option.setName('spreads')
-            .setDescription('if it spreads to other body parts')
-            .setRequired(false)
-    )
-    .addNumberOption(option =>
-        option.setName('spreadrate')
-            .setDescription('rate it spreads across the body, if applicable')
-            .setRequired(false)
-    )
-    .addNumberOption(option =>
-        option.setName('softdamage')
-            .setDescription('damage to the part in only usability, can\'t disable subparts')
-            .setRequired(false)
-    )
-    .addNumberOption(option =>
-        option.setName('immunity')
-            .setDescription('progression of disease immunity')
-            .setRequired(false)
-    )
-    .addBooleanOption(option =>
-        option.setName('unusable')
-            .setDescription('renders the part unusable regardless of damage')
-            .setRequired(false)
-    )
-commands.push(c)
+// var c;
+//
+// c = new SlashCommandBuilder()
+//     .setName('applydamage')
+//     .setDescription("applies custom damage modifiers to any target")
+//     .addStringOption(option =>
+//         option.setName('bodypart')
+//             .setDescription('part to modify')
+//             .setRequired(true)
+//     )
+//     .addStringOption(option =>
+//         option.setName('target')
+//             .setDescription('who to modify')
+//             .setRequired(true)
+//     )
+//     .addStringOption(option =>
+//         option.setName('name')
+//             .setDescription('name of injury/disease')
+//             .setRequired(false)
+//     )
+//     .addNumberOption(option =>
+//         option.setName('damage')
+//             .setDescription('raw damage caused to the part it\'s applied to')
+//             .setRequired(false)
+//     )
+//     .addNumberOption(option =>
+//         option.setName('growth')
+//             .setDescription('rate of progression')
+//             .setRequired(false)
+//     )
+//     .addStringOption(option =>
+//         option.setName('stage')
+//             .setDescription('stage of the injury/disease')
+//             .setRequired(false)
+//     )
+//     .addBooleanOption(option =>
+//         option.setName('spreads')
+//             .setDescription('if it spreads to other body parts')
+//             .setRequired(false)
+//     )
+//     .addNumberOption(option =>
+//         option.setName('spreadrate')
+//             .setDescription('rate it spreads across the body, if applicable')
+//             .setRequired(false)
+//     )
+//     .addNumberOption(option =>
+//         option.setName('softdamage')
+//             .setDescription('damage to the part in only usability, can\'t disable subparts')
+//             .setRequired(false)
+//     )
+//     .addNumberOption(option =>
+//         option.setName('immunity')
+//             .setDescription('progression of disease immunity')
+//             .setRequired(false)
+//     )
+//     .addBooleanOption(option =>
+//         option.setName('unusable')
+//             .setDescription('renders the part unusable regardless of damage')
+//             .setRequired(false)
+//     )
+// commands.push(c)
 
 console.log(commands)
 

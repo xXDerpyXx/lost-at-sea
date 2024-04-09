@@ -39,6 +39,7 @@ const commandData=
             description: 'you go to sleep',
             options: [
                 {
+                    type:"string",
                     name:"hours",
                     description: 'hours to sleep (can include decimals)',
                     required: true
@@ -50,6 +51,7 @@ const commandData=
             description: "Use an item, and provide any other items it may require.",
             options: [
                 {
+                    type:"string",
                     name:"item",
                     description: 'Item to show.',
                     required: true
@@ -61,6 +63,7 @@ const commandData=
             description: 'shows an item',
             options: [
                 {
+                    type:"string",
                     name:"item",
                     description: 'item to show',
                     required: true
@@ -72,11 +75,13 @@ const commandData=
             description: 'shatters bones',
             options: [
                 {
+                    type:"string",
                     name:"bodypart",
                     description: 'What part of the body to shatter.',
                     required: true
                 },
                 {
+                    type:"string",
                     name:"target",
                     description: 'Who to shatter',
                     required: true
@@ -88,11 +93,13 @@ const commandData=
             description: "Swim across the map.",
             options: [
                 {
+                    type:"string",
                     name:"lateral",
                     description: 'lattitude to travel (in miles, positive for north, negative for south)',
                     required: true
                 },
                 {
+                    type:"string",
                     name:"longitudinal",
                     description: 'longitude to travel (in miles, positive for east, negative for west)',
                     required: true
@@ -104,18 +111,102 @@ const commandData=
             description: "Teleport Players to specific latitude and longitude",
             options: [
                 {
+                    type:"string",
                     name:"latitude",
                     description: 'lattitude to travel (Negative values for south of the equator)',
                     required: true
                 },
                 {
+                    type:"string",
                     name:"longitude",
                     description: 'longitude to travel (Negative Values for West of the prime meridian)',
                     required: true
                 }
             ]
+        },
+        {
+            name: "applydamage",
+            description: "applies custom damage modifiers to any target",
+            options: [
+                {
+                    type:"string",
+                    name:"bodypart",
+                    description: 'part to modify',
+                    required: true
+                },
+                {
+                    type:"string",
+                    name:"target",
+                    description: 'who to modify on',
+                    required: true
+                },
+                {
+                    type:"string",
+                    name:"name",
+                    description: "Name of the injury/dissease",
+                    required: false
+                },
+                {
+                    type:"number",
+                    name:"damage",
+                    description: 'raw damage caused to the part it is applied to',
+                    required: false
+                },
+                {
+                    type:"number",
+                    name:"growth",
+                    description: "The rate of progression'",
+                    required: false
+                },
+                {
+                    type:"string",
+                    name:"stage",
+                    description: "Stage of the injury/dissease",
+                    required: false
+                },
+                {
+                    type:"boolean",
+                    name:"spreads",
+                    description: "If it spreads to other body parts",
+                    required: false
+                },
+                {
+                    type:"number",
+                    name:"spreadrate",
+                    description: 'rate it spreads across the body, if applicable',
+                    required: false
+                },
+                {
+                    type:"number",
+                    name:"softdamage",
+                    description: 'damage to the part in only usability, can\'t disable subparts',
+                    required: false
+                },
+                {
+                    type:"number",
+                    name:"immunity",
+                    description: "progression of disease immunity",
+                    required: false
+                },
+                {
+                    type:"boolean",
+                    name:"unusable",
+                    description: "'renders the part unusable regardless of damage",
+                    required: false
+                },
+            ]
         }
     ]
+
+function buildOption(op){
+    return (
+        option =>
+            option
+                .setName(op.name)
+                .setDescription(op.description)
+                .setRequired(op.required)
+    )
+}
 
 /**
  * From the database of commands, automatically generate SlashCommandBuilder commands
@@ -132,23 +223,28 @@ function buildCommands(commandData){
             .setName(com.name)
             .setDescription(com.description)
 
+
         // Construct the string options if they exist
         if (com.options !== undefined){
             for (let op of com.options){
-                c.addStringOption(
-                    option =>
-                        option
-                            .setName(op.name)
-                            .setDescription(op.description)
-                            .setRequired(op.required)
-                )
+
+                // Check the type of the option and build accordingly
+                switch (op.type){
+                    case "string":
+                        c.addStringOption( buildOption(op) );
+                        break;
+                    case  "number":
+                        c.addNumberOption( buildOption(op) );
+                        break;
+                    case  "boolean":
+                        c.addBooleanOption( buildOption(op) );
+                        break;
+                }
             }
         }
         // Add that completed command to the list of commands :troll:
         commands.push(c)
     }
-
-
 
     return commands
 }
