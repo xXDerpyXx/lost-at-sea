@@ -174,10 +174,30 @@ function oob(x,y){
     return true;
 }
 
+Object.prototype.clone = Array.prototype.clone = function() {
+    if (Object.prototype.toString.call(this) === '[object Array]') {
+        var clone = [];
+        for (var i = 0; i < this.length; i++)
+            clone[i] = this[i].clone();
+
+        return clone;
+    } else if (typeof(this) === "object") {
+        var clone = {};
+        for (var prop in this) {
+            if (this.hasOwnProperty(prop))
+                clone[prop] = this[prop].clone();
+            }
+        return clone;
+    } else {
+        return this;
+    }
+}
+
+
 function generateMap(){
     var width = 3600
     var height = 1800
-    var smoothness = 2
+    var smoothness = 20
     var seaLevel = 105
     var m = []
     console.log("map generating")
@@ -185,16 +205,34 @@ function generateMap(){
         m[x] = []
         for(var y = 0; y < height; y++){
             m[x][y] = {
-                elevation:110-(Math.random()*11),
+                elevation:110-(Math.random()*20),
                 tileChar:"~",
                 land:false,
                 reef:false
             }
         }
     }
-    console.log("smoothing terrain")
+
+    console.log("adding islands")
+
+    for(var x = 0; x < width; x++){
+        for(var y = 0; y < height; y++){
+            if(Math.random() > 0.999){
+                var size = Math.floor(Math.random()*10)
+                for(var i = -1*size; i < size; i++){
+                    for(var j = -1*size; j < size; j++){
+                        if(!oob(x+i,y+j)){
+                            m[x+i][y+j].elevation += (Math.random()*10)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    console.log("smoothing terrain ("+smoothness+" passes)")
 
     for(var k = 0; k < smoothness; k++){
+        tm = m.slice()
         for(var x = 0; x < width; x++){
             for(var y = 0; y < height; y++){
                 var avg = 0
@@ -207,16 +245,53 @@ function generateMap(){
                         }
                     }
                 }
-                m[x][y].elevation = avg/tiles
+                tm[x][y].elevation = avg/tiles
+            }
+        }
+        m = tm.slice()
+    }
+    console.log("generating island terrain")
+
+    for(var x = 0; x < width; x++){
+        for(var y = 0; y < height; y++){
+            if(m[x][y].elevation > seaLevel){
+                m[x][y].elevation += (Math.random()*4)-2
             }
         }
     }
+
+    console.log("smoothing islands")
+
+    
+    for(var k = 0; k < 3; k++){
+        tm = m.slice()
+        for(var x = 0; x < width; x++){
+            for(var y = 0; y < height; y++){
+                if(m[x][y].elevation > seaLevel){
+                    var avg = 0
+                    var tiles = 0
+                    for(var i = -1; i < 2; i++){
+                        for(var j = -1; j < 2; j++){
+                            if(!oob(x+i,y+j)){
+                                tiles++;
+                                avg += m[x+i][y+j].elevation
+                            }
+                        }
+                    }
+                    tm[x][y].elevation = avg/tiles
+                }
+            }
+        }
+        m = tm.slice()
+    }
+
+
     console.log("generating reefs")
     for(var k = 0; k < smoothness; k++){
         for(var x = 0; x < width; x++){
             for(var y = 0; y < height; y++){
                 if(m[x][y].elevation < seaLevel-1 && m[x][y].elevation > seaLevel-2){
-                    if(Math.random() > 0.99){
+                    if(Math.random() > 0.999){
                         m[x][y].reef = true;
                     }
                 }
@@ -243,15 +318,24 @@ function generateMap(){
             }
         }
     }
-
+    var totalTiles = 0;
+    var land = 0;
     console.log("generating textures")
     for(var x = 0; x < width; x++){
         for(var y = 0; y < height; y++){
+            totalTiles++;
+            land++;
             if(m[x][y].elevation <= seaLevel){
+                land--;
                 if(m[x][y].reef){
                     m[x][y].tileChar = "-"
-                }else
-                    m[x][y].tileChar = "~"
+                }else{
+                    if(m[x][y].elevation >= seaLevel-2){
+                        m[x][y].tileChar = "."
+                    }else{
+                        m[x][y].tileChar = "~"
+                    }
+                }
             }else if(m[x][y].elevation <= seaLevel+1){
                 m[x][y].tileChar = "░"
                 m[x][y].land = true;
@@ -269,7 +353,7 @@ function generateMap(){
 
         }
     }
-
+    console.log("land percentage: "+((land/totalTiles)*100))
     console.log("map complete")
     return m;
 }
@@ -282,11 +366,12 @@ function dist(ax,ay,bx,by){
 
 function drawMap(x,y,radius){
     var output = "";
-    for(var i = x-radius; i < x+radius; i++){
-        for(var j = y-radius; j < y+radius; j++){
+    for(var j = y-radius; j < y+radius; j++){
+        for(var i = x-radius; i < x+radius; i++){
             if(!oob(i,j)){
-                if(dist(x,y,j,i) <= radius-1){
-                    output += map[j][i].tileChar;
+                //console.log(dist(y,x,j,i))
+                if(dist(x,y,i,j) <= radius-1){
+                    output += map[i][j].tileChar;
                 }else
                     output += " "
             }else
@@ -305,6 +390,10 @@ function colorifyMap(map){
             end:""
         },
         "~":{ // blue
+            start: "[2;34m",
+            end: "[0m"
+        },
+        ".":{ // blue
             start: "[2;34m",
             end: "[0m"
         },
@@ -335,7 +424,7 @@ function colorifyMap(map){
     // Our result string
     let coloredmap = "";
     // Set of accepted characters - feel free to extend if there is more characters
-    let characterSetRegex = /[ ~\-░▒█]/;
+    let characterSetRegex = /[ ~.\-░▒█]/;
 
     for (let i = 0 ; i < map.length ; i++){
 
@@ -732,7 +821,7 @@ client.on('messageCreate', (msg) => {
 client.on('ready',()=>{
     map = generateMap();
     coords = polarToPlanar(0,0)
-    mapText = drawMap(coords[0],coords[1],3600)
+    mapText = drawMap(coords[0],coords[1],1800)
     fs.writeFileSync("map.txt",mapText)
 })
 
