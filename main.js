@@ -524,7 +524,7 @@ function adjustForCurve(lat,lon){
 
     while(lon > 180)
         lon-=360
-    while(lon < -918)
+    while(lon < -180)
         lon+=360
     return [lat,lon]
 }
@@ -726,8 +726,8 @@ function passTime(id,hours){
 function getPlayerLocation(id){
     let locationString = "";
     // We round to 4dp
-    let latitude = Math.abs(players[id].latitude.toFixed(4));
-    let longitude = Math.abs(players[id].longitude.toFixed(4));
+    let latitude = players[id].latitude.toFixed(4);
+    let longitude = players[id].longitude.toFixed(4);
 
     let latsuffix = "°S"
     let lonsuffix = "°E"
@@ -737,13 +737,13 @@ function getPlayerLocation(id){
         latsuffix = "°N"
     }
 
-    if (latitude < 0){ // Account for negative longitude
+    if (longitude < 0){ // Account for negative longitude
         lonsuffix = "°W"
     } else {
         lonsuffix = "°E"
     }
 
-    locationString += `Your location is (`+latitude+latsuffix+", "+longitude+lonsuffix+`)`;
+    locationString += `Your location is (`+Math.abs(latitude)+latsuffix+", "+Math.abs(longitude)+lonsuffix+`)`;
 
 
     return locationString;
@@ -966,7 +966,9 @@ client.on('interactionCreate', async (interaction) => {
                 const longitude = parseFloat(interaction.options.getString("longitude"))
                 players[pid].latitude = latitude
                 players[pid].longitude = longitude
-                players[pid].latitude,players[pid].longitude = adjustForCurve(players[pid].latitude,players[pid].longitude)
+                var temp = adjustForCurve(players[pid].latitude,players[pid].longitude)
+                players[pid].latitude = temp[0]
+                players[pid].longitude = temp[1]
                 interaction.reply(""+getPlayerLocation(pid)+"")
     
             }            
@@ -1019,7 +1021,9 @@ client.on('interactionCreate', async (interaction) => {
             var timeTaken = (distance*100)*(1/players[pid].swimmingSpeed)
             players[pid].longitude += plon
             players[pid].latitude -= plat
-            players[pid].latitude,players[pid].longitude = adjustForCurve(players[pid].latitude,players[pid].longitude)
+            var temp = adjustForCurve(players[pid].latitude,players[pid].longitude)
+            players[pid].latitude = temp[0]
+            players[pid].longitude = temp[1]
             passTime(pid,timeTaken)
             if(deadCheck(players[pid].body)[1]){
                 interaction.reply("you died while swimming")
