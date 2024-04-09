@@ -119,16 +119,16 @@ function formatTime(time){
     return timeString;
 }
 
-function formatLengthOfTime(time){
+function formatLengthOfTime(hours){
     // Our result string
     var timeString = "";
     var parts = [];
     // No decimal point time
-    if(parseInt(time) == parseFloat(time)){
-        parts[0] = time;
+    if(parseInt(hours) == parseFloat(hours)){
+        parts[0] = hours;
         parts[1] = "0"
     }else{
-        parts = time.toFixed(2).toString().split(".")
+        parts = hours.toFixed(2).toString().split(".")
         if(parseInt(parts[1]) < 10 && parts[1].length == 1){
             parts[1] = parts[1]*10
         }
@@ -749,6 +749,13 @@ function getPlayerLocation(id){
     return locationString;
 }
 
+/**
+ * Return miles into kilometers rounded to 4dp
+ * */
+function mileToKm(miles){
+    return (miles * 1.609).toFixed(2);
+}
+
 var commands = [];
 
 var c = new SlashCommandBuilder()
@@ -1029,7 +1036,10 @@ client.on('interactionCreate', async (interaction) => {
                 interaction.reply("you died while swimming")
                 return;
             }
-            interaction.reply("you traveled "+(distance*100).toFixed(2)+" miles, and it took "+formatLengthOfTime(timeTaken))
+            const distanceMiles = (distance*100).toFixed(2)
+            interaction.reply(
+            `You travelled ${distanceMiles} miles (${mileToKm(distanceMiles)}km) and it took ${formatLengthOfTime(timeTaken)}!`
+            )
             save(false)
             return;
         }
