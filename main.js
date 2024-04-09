@@ -149,7 +149,7 @@ function formatLengthOfTime(hours){
 
 class modifier{
     constructor(n){
-        this.name = n;
+        this.name = n; // name of the injury/disease (bruise/scratch/polio/etc)
         this.damage = 0; // flat rate damage done to body part when modifier is applied
         this.growth = 0; // rate that damage increases during medical check
         this.stage = "malignant"; // stage of cancer/infection/disease (malignant/immune/etc)
@@ -652,7 +652,8 @@ function bodyToString(body,partName,layer,layerString){
         mods = " ("+mods+")"
     }
     finalString = "["+partName + " <" + hpToString(body[partName]) + ">"+mods+"]"+highlight;
-
+    if(getBodyPartHp(body[partName])[0] == 0)
+        return finalString+" disabled!"
     let partsDone = 0;
     let totalParts = getSubBodyPartCount(body[partName]);
 
@@ -875,6 +876,67 @@ function mileToKm(miles){
 //
 // commands.push(c)
 
+var c;
+
+c = new SlashCommandBuilder()
+    .setName('applydamage')
+    .setDescription("applies custom damage modifiers to any target")
+    .addStringOption(option =>
+        option.setName('bodypart')
+            .setDescription('part to modify')
+            .setRequired(true)
+    )
+    .addStringOption(option =>
+        option.setName('target')
+            .setDescription('who to modify')
+            .setRequired(true)
+    )
+    .addStringOption(option =>
+        option.setName('name')
+            .setDescription('name of injury/disease')
+            .setRequired(false)
+    )
+    .addNumberOption(option =>
+        option.setName('damage')
+            .setDescription('raw damage caused to the part it\'s applied to')
+            .setRequired(false)
+    )
+    .addNumberOption(option =>
+        option.setName('growth')
+            .setDescription('rate of progression')
+            .setRequired(false)
+    )
+    .addStringOption(option =>
+        option.setName('stage')
+            .setDescription('stage of the injury/disease')
+            .setRequired(false)
+    )
+    .addBooleanOption(option =>
+        option.setName('spreads')
+            .setDescription('if it spreads to other body parts')
+            .setRequired(false)
+    )
+    .addNumberOption(option =>
+        option.setName('spreadrate')
+            .setDescription('rate it spreads across the body, if applicable')
+            .setRequired(false)
+    )
+    .addNumberOption(option =>
+        option.setName('softdamage')
+            .setDescription('damage to the part in only usability, can\'t disable subparts')
+            .setRequired(false)
+    )
+    .addNumberOption(option =>
+        option.setName('immunity')
+            .setDescription('progression of disease immunity')
+            .setRequired(false)
+    )
+    .addBooleanOption(option =>
+        option.setName('unusable')
+            .setDescription('renders the part unusable regardless of damage')
+            .setRequired(false)
+    )
+commands.push(c)
 
 console.log(commands)
 
@@ -996,6 +1058,39 @@ client.on('interactionCreate', async (interaction) => {
                 mod.damage = 50
                 players[target].body = applyModifier(players[target].body,bt,mod)
                 interaction.reply("you shattered <@"+target+">'s "+bt)
+                save(false);
+            }
+
+            if(interaction.commandName == "applydamage"){
+                var bt = interaction.options.getString("bodypart");
+                var target = getUserFromMention(interaction.options.getString("target"))
+
+                var mod = new modifier(interaction.options.getString("name"))
+                if(players[target] == null){
+                    interaction.reply("they do not exist")
+                    return;
+                }
+                if(interaction.options.getNumber("damage"))
+                    mod.damage = interaction.options.getNumber("damage")
+                if(interaction.options.getNumber("growth"))
+                    mod.growth = interaction.options.getNumber("growth")
+                if(interaction.options.getString("stage"))
+                    mod.stage = interaction.options.getString("stage")
+                if(interaction.options.getBoolean("spreads"))
+                    mod.spreads = interaction.options.getBoolean("spreads")
+                if(interaction.options.getNumber("spreadrate"))
+                    mod.spreadRate = interaction.options.getNumber("spreadrate")
+                if(interaction.options.getNumber("softdamage"))
+                    mod.softDamage = interaction.options.getNumber("softdamage")
+                if(interaction.options.getNumber("immunity"))
+                    mod.immunity = interaction.options.getNumber("immunity")
+                if(interaction.options.getBoolean("unusable"))
+                    mod.unusable = interaction.options.getBoolean("unusable")
+
+
+
+                players[target].body = applyModifier(players[target].body,bt,mod)
+                interaction.reply("you applied '"+mod.name+"' <@"+target+">'s "+bt)
                 save(false);
             }
         }
