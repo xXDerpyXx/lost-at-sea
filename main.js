@@ -164,7 +164,7 @@ class modifier{
 class body{
     constructor(){
         // Imported from spine.js file, because holy shit the datastructure is massive!
-        this.spine = baseBody;
+        this.spine = structuredClone(baseBody);
     }
 }
 
@@ -200,6 +200,7 @@ function oob(x,y){
     return true;
 }
 
+/*
 Object.prototype.clone = Array.prototype.clone = function() {
     if (Object.prototype.toString.call(this) === '[object Array]') {
         var clone = [];
@@ -217,7 +218,7 @@ Object.prototype.clone = Array.prototype.clone = function() {
     } else {
         return this;
     }
-}
+}*/
 
 
 function generateMap(interaction){
@@ -533,6 +534,7 @@ function deadCheck(b,part){
     if(part == null){
         part = "spine"
     }
+    console.log(part)
     if(getBodyPartHp(b)[0] == 0 && b.required){
         dead = true;
         return [b[part],dead]
@@ -998,7 +1000,7 @@ client.on('interactionCreate', async (interaction) => {
             players[pid].longitude += plon
             players[pid].latitude -= plat
             passTime(pid,timeTaken)
-            if(deadCheck(players[pid].body)){
+            if(deadCheck(players[pid].body)[1]){
                 interaction.reply("you died while swimming")
                 return;
             }
