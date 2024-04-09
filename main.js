@@ -211,6 +211,39 @@ function generateMap(){
             }
         }
     }
+    console.log("generating reefs")
+    for(var k = 0; k < smoothness; k++){
+        for(var x = 0; x < width; x++){
+            for(var y = 0; y < height; y++){
+                if(m[x][y].elevation < seaLevel-1 && m[x][y].elevation > seaLevel-2){
+                    if(Math.random() > 0.99){
+                        m[x][y].reef = true;
+                    }
+                }
+            }
+        }
+    }
+
+    var reefChecks = 3
+
+    for(var k = 0; k < reefChecks; k++){
+        for(var x = 0; x < width; x++){
+            for(var y = 0; y < height; y++){
+                if( m[x][y].reef && Math.random() > 0.25){
+                    for(var i = -1; i < 2; i++){
+                        for(var j = -1; j < 2; j++){
+                            if(!oob(x+i,y+j)){
+                                if(m[x+i][y+j].elevation < seaLevel-1 && m[x+i][y+j].elevation > seaLevel-2){
+                                    m[x+i][y+j].reef = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     console.log("generating textures")
     for(var x = 0; x < width; x++){
         for(var y = 0; y < height; y++){
@@ -252,8 +285,8 @@ function drawMap(x,y,radius){
     for(var i = x-radius; i < x+radius; i++){
         for(var j = y-radius; j < y+radius; j++){
             if(!oob(i,j)){
-                if(dist(x,y,i,j) <= radius-1){
-                    output += map[i][j].tileChar;
+                if(dist(x,y,j,i) <= radius-1){
+                    output += map[j][i].tileChar;
                 }else
                     output += " "
             }else
@@ -698,7 +731,12 @@ client.on('messageCreate', (msg) => {
 
 client.on('ready',()=>{
     map = generateMap();
+    coords = polarToPlanar(0,0)
+    mapText = drawMap(coords[0],coords[1],3600)
+    fs.writeFileSync("map.txt",mapText)
 })
+
+var repeats = 0;
 
 client.on('interactionCreate', async (interaction) => {
 
@@ -769,8 +807,14 @@ client.on('interactionCreate', async (interaction) => {
         if(interaction.commandName == "checkmapcolor"){
             var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
             let mapText = drawMap(coords[0],coords[1],10)
-            colorifyMap(mapText)
-            interaction.reply("```ansi\n"+colorifyMap(mapText)+"\n```")
+            let msg = await interaction.reply("```ansi\n"+colorifyMap(mapText)+"\n```");
+            let repeats = 0;
+            setInterval(()=>{
+                repeats+=0.1;
+                coords = polarToPlanar(players[pid].latitude,players[pid].longitude+repeats)
+                mapText = drawMap(coords[0],coords[1],10)
+                msg.edit("```ansi\n"+colorifyMap(mapText)+"\n```")
+            }, 500);
         }
 
         if(interaction.commandName == "sleep"){
