@@ -90,7 +90,6 @@ function fuzzyTime(time){
 function formatTime(time){
     // Our result string
     var timeString = "";
-    console.log(time)
     var suffix = "am"
     var parts = [];
     // No decimal point time
@@ -98,11 +97,10 @@ function formatTime(time){
         parts[0] = time;
         parts[1] = "0"
     }else{
-        parts = time.toString().split(".")
+        parts = time.toFixed(2).toString().split(".")
     }
     
     parts[0] = parseFloat(parts[0])+1
-    console.log(parts)
 
     // Check if afternoon
     if(parts[0] > 12){
@@ -113,12 +111,38 @@ function formatTime(time){
         parts[1] += "0"
     }
 
-    parts[1] = ((parseInt(parts[1])/100)*60)
-    console.log(parts[1])
+    parts[1] = Math.round((parseInt(parts[1])/100)*60)
     if(parts[1] < 10){
         parts[1] = "0"+parts[1]
     }
     timeString = parts[0]+":"+parts[1]+suffix
+    return timeString;
+}
+
+function formatLengthOfTime(time){
+    // Our result string
+    var timeString = "";
+    var parts = [];
+    // No decimal point time
+    if(parseInt(time) == parseFloat(time)){
+        parts[0] = time;
+        parts[1] = "0"
+    }else{
+        parts = time.toFixed(2).toString().split(".")
+        if(parseInt(parts[1]) < 10 && parts[1].length == 1){
+            parts[1] = parts[1]*10
+        }
+    }
+    
+    parts[0] = parseFloat(parts[0])
+    parts[1] = ((parseInt(parts[1])/100)*60)
+
+    if(parts[1] != 0){
+        timeString = parts[0]+" hours, "+parts[1].toFixed(0)+" minutes"
+    }else{
+        timeString = parts[0]+" hours"
+    }
+
     return timeString;
 }
 
@@ -161,11 +185,13 @@ class player{
         this.daysAtSea = 0; // Player's time spent in the game
         this.constantTime = 0; // hours of time in game TOTAL (used for timekeeping)
 
+        this.swimmingSpeed = 2
+
         this.body = new body()
     }
 }
 
-map = []
+var map = []
 
 function oob(x,y){
     if(x > 0 && x < 3600 && y > 0 && y < 1800){
@@ -194,13 +220,16 @@ Object.prototype.clone = Array.prototype.clone = function() {
 }
 
 
-function generateMap(){
+function generateMap(interaction){
     var width = 3600
     var height = 1800
     var smoothness = 20
     var seaLevel = 105
     var m = []
-    console.log("map generating")
+    if(interaction != null)
+        interaction.followUp("map generating")
+    else
+        console.log("map generating")
     for(var x = 0; x < width; x++){
         m[x] = []
         for(var y = 0; y < height; y++){
@@ -212,8 +241,10 @@ function generateMap(){
             }
         }
     }
-
-    console.log("adding islands")
+    if(interaction != null)
+        interaction.followUp("adding islands")
+    else
+        console.log("adding islands")
 
     for(var x = 0; x < width; x++){
         for(var y = 0; y < height; y++){
@@ -229,7 +260,11 @@ function generateMap(){
             }
         }
     }
-    console.log("smoothing terrain ("+smoothness+" passes)")
+
+    if(interaction != null)
+        interaction.followUp("smoothing ocean ("+smoothness+" passes)")
+    else
+        console.log("smoothing ocean ("+smoothness+" passes)")
 
     for(var k = 0; k < smoothness; k++){
         tm = m.slice()
@@ -250,7 +285,10 @@ function generateMap(){
         }
         m = tm.slice()
     }
-    console.log("generating island terrain")
+    if(interaction != null)
+        interaction.followUp("generating island terrain")
+    else
+        console.log("generating island terrain")
 
     for(var x = 0; x < width; x++){
         for(var y = 0; y < height; y++){
@@ -260,10 +298,15 @@ function generateMap(){
         }
     }
 
-    console.log("smoothing islands")
+    var islandSmoothness = 3
+
+    if(interaction != null)
+        interaction.followUp("smoothing islands ("+islandSmoothness+" passes)")
+    else
+        console.log("smoothing islands ("+islandSmoothness+" passes)")
 
     
-    for(var k = 0; k < 3; k++){
+    for(var k = 0; k < islandSmoothness; k++){
         tm = m.slice()
         for(var x = 0; x < width; x++){
             for(var y = 0; y < height; y++){
@@ -286,7 +329,10 @@ function generateMap(){
     }
 
 
-    console.log("generating reefs")
+    if(interaction != null)
+        interaction.followUp("generating reefs")
+    else
+        console.log("generating reefs")
     for(var k = 0; k < smoothness; k++){
         for(var x = 0; x < width; x++){
             for(var y = 0; y < height; y++){
@@ -320,7 +366,10 @@ function generateMap(){
     }
     var totalTiles = 0;
     var land = 0;
-    console.log("generating textures")
+    if(interaction != null)
+        interaction.followUp("generating textures")
+    else
+        console.log("generating textures")
     for(var x = 0; x < width; x++){
         for(var y = 0; y < height; y++){
             totalTiles++;
@@ -354,7 +403,10 @@ function generateMap(){
         }
     }
     console.log("land percentage: "+((land/totalTiles)*100))
-    console.log("map complete")
+    if(interaction != null)
+        interaction.followUp("map complete")
+    else
+        console.log("map complete")
     return m;
 }
 
@@ -651,7 +703,7 @@ function passTime(id,hours){
     players[id].constantTime += hours;
 
     // Account for hours
-    if(players[id].time > 24){
+    while(players[id].time > 24){
         players[id].time -= 24;
         players[id].daysAtSea+=1
     }
@@ -759,6 +811,21 @@ c = new SlashCommandBuilder()
 commands.push(c)
 
 c = new SlashCommandBuilder()
+    .setName('swim')
+    .setDescription("lets you swim")
+    .addStringOption(option =>
+        option.setName('lateral')
+            .setDescription('lattitude to travel (in miles, positive for north, negative for south)')
+            .setRequired(true)
+    )
+    .addStringOption(option =>
+        option.setName('longitudinal')
+            .setDescription('longitude to travel (in miles, positive for east, negative for west)')
+            .setRequired(true)
+    );
+commands.push(c)
+
+c = new SlashCommandBuilder()
     .setName('checklocation')
     .setDescription("get the player's location on the map")
 
@@ -787,13 +854,21 @@ const rest = new REST({ version: '10' }).setToken(TOKEN);
 // "Database" of players
 var players = {}
 
-function save(){
+function save(saveMap){
     fs.writeFileSync("players.json",JSON.stringify(players))
+    if(saveMap !== false)
+        fs.writeFileSync("map.json",JSON.stringify(map))
 }
 
 function load(){
     var temp = fs.readFileSync("players.json")
     players = JSON.parse(temp)
+    if(fs.existsSync("map.json")){
+        temp = fs.readFileSync("map.json")
+        map = JSON.parse(temp)
+    }else{
+        map = []
+    }
 }
 
 load()
@@ -819,9 +894,12 @@ client.on('messageCreate', (msg) => {
 })
 
 client.on('ready',()=>{
-    map = generateMap();
-    coords = polarToPlanar(0,0)
-    mapText = drawMap(coords[0],coords[1],1800)
+    if(map[1] == null){
+        map = generateMap();
+        save()
+    }
+    var coords = polarToPlanar(0,0)
+    var mapText = drawMap(coords[0],coords[1],1800)
     fs.writeFileSync("map.txt",mapText)
 })
 
@@ -849,8 +927,9 @@ client.on('interactionCreate', async (interaction) => {
             }
 
             if(interaction.commandName == "regenmap"){
-                interaction.reply("the world has been erased then remade")
-                map = generateMap();
+                await interaction.reply("regenerating map")
+                map = generateMap(interaction);
+                save()
             }
 
             
@@ -888,6 +967,27 @@ client.on('interactionCreate', async (interaction) => {
             return;
         }
 
+        if(interaction.commandName == "swim"){
+            var lon = parseFloat(interaction.options.getString("longitudinal"));
+            var lat = parseFloat(interaction.options.getString("lateral"));
+
+            if(lat+" " == "NaN " || lon+" " == "NaN "){
+                interaction.reply("use a number in miles, decimals are allowed, but numbers only")
+                return;
+            }
+
+            plon = lon/100; //longitude in degrees
+            plat = lat/100; //latitude in degrees
+            var distance = dist(players[pid].longitude,players[pid].latitude,players[pid].longitude+plon,players[pid].latitude+plat)
+            var timeTaken = (distance*100)*(1/players[pid].swimmingSpeed)
+            players[pid].longitude += plon
+            players[pid].latitude -= plat
+            passTime(pid,timeTaken)
+            interaction.reply("you traveled "+(distance*100).toFixed(2)+" miles, and it took "+formatLengthOfTime(timeTaken))
+            save(false)
+            return;
+        }
+
         if(interaction.commandName == "checkmap"){
             var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
             interaction.reply("```\n"+drawMap(coords[0],coords[1],10)+"\n```")
@@ -897,13 +997,14 @@ client.on('interactionCreate', async (interaction) => {
             var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
             let mapText = drawMap(coords[0],coords[1],10)
             let msg = await interaction.reply("```ansi\n"+colorifyMap(mapText)+"\n```");
+            /*  map scanner, may become its own command one day in the distant future, leave here for reference
             let repeats = 0;
             setInterval(()=>{
                 repeats+=0.1;
                 coords = polarToPlanar(players[pid].latitude,players[pid].longitude+repeats)
                 mapText = drawMap(coords[0],coords[1],10)
                 msg.edit("```ansi\n"+colorifyMap(mapText)+"\n```")
-            }, 500);
+            }, 500);*/
         }
 
         if(interaction.commandName == "sleep"){
