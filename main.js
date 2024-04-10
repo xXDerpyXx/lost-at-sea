@@ -453,6 +453,10 @@ function colorifyMap(map){
             start: "[2;36m[2;32m",
             end: "[0m[2;36m[0m"
         },
+        "▓": {
+            start: "[2;36m[2;32m",
+            end: "[0m"
+        },
         "█": {
             start: "[2;30m",
             end: "[0m"
