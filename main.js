@@ -547,7 +547,16 @@ function deadCheck(b,part){
     dead = false
     if(part == null){
         part = "spine"
+        if(getBodyPartHp(b["spine"]["chest"]["leftLung"])[0] == 0 && getBodyPartHp(b["spine"]["chest"]["rightLung"])[0] == 0){
+            return [b[part],true]
+        }
+        if(getBodyPartHp(b["spine"]["lowerTorso"]["leftKidney"])[0] == 0 && getBodyPartHp(b["spine"]["lowerTorso"]["rightKidney"])[0] == 0){
+            return [b[part],true]
+        }
     }
+
+
+
     if(getBodyPartHp(b)[0] == 0 && b.required){
         dead = true;
         return [b[part],dead]
@@ -653,6 +662,8 @@ function bodyToString(body,partName,layer,layerString){
     }
     finalString = "["+partName + " <" + hpToString(body[partName]) + ">"+mods+"]"+highlight;
     if(getBodyPartHp(body[partName])[0] == 0)
+        return finalString+" destroyed!"
+    else if(getBodyPartHp(body[partName])[1] == 0)
         return finalString+" disabled!"
     let partsDone = 0;
     let totalParts = getSubBodyPartCount(body[partName]);
@@ -693,15 +704,58 @@ function bodyToString(body,partName,layer,layerString){
  * @return bodyPart the base bodyPart, now modified from the function.
  * */
 function applyModifier(bodyPart,targetPart,modifier){
+    if(targetPart == "this"){
+        bodyPart.modifiers.push(modifier)
+    }else{
+        for(let subBodyPart in bodyPart){
+            // Check through every sub-body-part that body part has (exclude keys that aren't sub-body-parts ofc)
+            if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
+                if(subBodyPart === targetPart){
+                    // Body part found, apply the modifier!
+                    bodyPart[subBodyPart].modifiers.push(modifier)
+                }else{
+                    // Recursive case, perform your BFS until you find the body aprt
+                    bodyPart[subBodyPart] = applyModifier(bodyPart[subBodyPart],targetPart,modifier)
+                }
+            }
+        }
+    }
+    
+    return bodyPart;
+}
+
+function complexDamage(t,mod,bodyPart,r){
+
+    if(r == null){
+        r = 0.5
+    }
+
+    applyModifier(bodyPart,"this",mod)
+    if(t == "penetration"){
+        for(let subBodyPart in bodyPart){
+            // Check through every sub-body-part that body part has (exclude keys that aren't sub-body-parts ofc)
+            if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
+                if(Math.random() < r){
+                    // Recursive case, perform your BFS until you find the body aprt
+                    bodyPart[subBodyPart] = complexDamage(t,mod,bodyPart[subBodyPart],r)
+                }
+            }
+        }
+    }
+    return bodyPart
+}
+
+function applyComplexDamage(t,mod,bodyPart,r,targetPart){
     for(let subBodyPart in bodyPart){
         // Check through every sub-body-part that body part has (exclude keys that aren't sub-body-parts ofc)
         if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
             if(subBodyPart === targetPart){
                 // Body part found, apply the modifier!
-                bodyPart[subBodyPart].modifiers.push(modifier)
+                bodyPart[subBodyPart] = complexDamage(t,mod,bodyPart[subBodyPart],r)
+                return bodyPart
             }else{
                 // Recursive case, perform your BFS until you find the body aprt
-                bodyPart[subBodyPart] = applyModifier(bodyPart[subBodyPart],targetPart,modifier)
+                bodyPart[subBodyPart] = applyComplexDamage(t,mod,bodyPart[subBodyPart],r,targetPart)
             }
         }
     }
@@ -1058,6 +1112,20 @@ client.on('interactionCreate', async (interaction) => {
                 mod.damage = 50
                 players[target].body = applyModifier(players[target].body,bt,mod)
                 interaction.reply("you shattered <@"+target+">'s "+bt)
+                save(false);
+            }
+
+            if(interaction.commandName == "shoot"){
+                var bt = interaction.options.getString("bodypart");
+                var target = getUserFromMention(interaction.options.getString("target"));
+                var mod = new modifier("gunshot wound")
+                if(players[target] == null){
+                    interaction.reply("they do not exist")
+                    return;
+                }
+                mod.damage = 5
+                players[target].body = applyComplexDamage("penetration",mod,players[target].body,0.75,bt)
+                interaction.reply("you shot <@"+target+">'s "+bt)
                 save(false);
             }
 

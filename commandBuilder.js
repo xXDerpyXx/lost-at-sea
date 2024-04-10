@@ -88,6 +88,25 @@ const commandData=
                 }
             ]
         },
+
+        {
+            name: "shoot",
+            description: 'shoots people',
+            options: [
+                {
+                    type:"string",
+                    name:"bodypart",
+                    description: 'What part of the body to shoot.',
+                    required: true
+                },
+                {
+                    type:"string",
+                    name:"target",
+                    description: 'Who to shoot',
+                    required: true
+                }
+            ]
+        },
         {
             name: "swim",
             description: "Swim across the map.",
