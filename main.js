@@ -919,21 +919,21 @@ client.on('interactionCreate', async (interaction) => {
             interaction.reply("This is just a test for now")
         }
         if (interaction.commandName === "checklocation"){
-            let playerX, playerY
-            const playerLatitude = players[pid].latitude;
-            const playerLongitude = players[pid].longitude;
-            [playerX, playerY] = polarToPlanar(playerLatitude, playerLongitude);
-            playerX = Math.floor(playerX);
-            playerY = Math.floor(playerY);
+            if (gods.includes(pid)){
+                let playerX, playerY
+                const playerLatitude = players[pid].latitude;
+                const playerLongitude = players[pid].longitude;
+                [playerX, playerY] = polarToPlanar(playerLatitude, playerLongitude);
+                playerX = Math.floor(playerX);
+                playerY = Math.floor(playerY);
 
-            console.log(playerX, playerY)
-
-             const replyString = `Map Cords : (${playerX}, ${playerY}) . ${getPlayerLocation(pid)}`
-            interaction.reply(replyString)
-            // interaction.reply(""+getPlayerLocation(pid)+"")
+                console.log(playerX, playerY)
+                const replyString = `Map Cords : (${playerX}, ${playerY}) . ${getPlayerLocation(pid)}`
+                interaction.reply(replyString)
+            } else {
+                interaction.reply(""+getPlayerLocation(pid)+"")
+            }
         }
-        
-
     }
 })
 
