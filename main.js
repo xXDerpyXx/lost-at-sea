@@ -201,27 +201,6 @@ function oob(x,y){
     return true;
 }
 
-/*
-Object.prototype.clone = Array.prototype.clone = function() {
-    if (Object.prototype.toString.call(this) === '[object Array]') {
-        var clone = [];
-        for (var i = 0; i < this.length; i++)
-            clone[i] = this[i].clone();
-
-        return clone;
-    } else if (typeof(this) === "object") {
-        var clone = {};
-        for (var prop in this) {
-            if (this.hasOwnProperty(prop))
-                clone[prop] = this[prop].clone();
-            }
-        return clone;
-    } else {
-        return this;
-    }
-}*/
-
-
 function generateMap(interaction){
     var width = 3600
     var height = 1800
@@ -416,8 +395,6 @@ function generateMap(interaction){
     return m;
 }
 
-
-
 function dist(ax,ay,bx,by){
     return Math.sqrt(((ax-bx)*(ax-bx))+((ay-by)*(ay-by)))
 }
@@ -481,7 +458,6 @@ function colorifyMap(map){
         }
     }
 
-
     //We make sure that you shouldn't do coloring overlaps
     let colorInUse = false;
     let currentSymbol = "";
@@ -523,8 +499,6 @@ function colorifyMap(map){
             coloredmap += map[i];
         }
     }
-    //
-    // console.log(coloredmap);
 
     return coloredmap;
 }
@@ -829,186 +803,6 @@ function getPlayerLocation(id){
 function mileToKm(miles){
     return (miles * 1.609).toFixed(2);
 }
-
-// var commands = [];
-//
-// var c = new SlashCommandBuilder()
-// .setName('getlost')
-// .setDescription('Gets you lost at sea.')
-//
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-// .setName('sleep')
-// .setDescription('you go to sleep')
-// .addStringOption(option =>
-//     option.setName('hours')
-//         .setDescription('hours to sleep (can include decimals)')
-//         .setRequired(true));
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-// .setName('showitem')
-// .setDescription('shows an item')
-// .addStringOption(option =>
-//     option.setName('item')
-//         .setDescription('item to show')
-//         .setRequired(true));
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-// .setName('checktime')
-// .setDescription('Checks the time.')
-//
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-// .setName('checkbody')
-// .setDescription('Checks your body.')
-//
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-// .setName('checkmap')
-// .setDescription('Checks your local area.')
-//
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-//     .setName('checkmapcolor')
-//     .setDescription('Checks your local area, but in color')
-//
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-//     .setName('use')
-//     .setDescription("Use an item, and provide any other items it may require.")
-//     .addStringOption(option =>
-//         option.setName('item')
-//             .setDescription('item to show')
-//             .setRequired(true)
-//     );
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-//     .setName('shatter')
-//     .setDescription("shatters bones")
-//     .addStringOption(option =>
-//         option.setName('bodypart')
-//             .setDescription('part to shatter')
-//             .setRequired(true)
-//     )
-//     .addStringOption(option =>
-//         option.setName('target')
-//             .setDescription('who to shatter')
-//             .setRequired(true)
-//     );
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-//     .setName('swim')
-//     .setDescription("lets you swim")
-//     .addStringOption(option =>
-//         option.setName('lateral')
-//             .setDescription('lattitude to travel (in miles, positive for north, negative for south)')
-//             .setRequired(true)
-//     )
-//     .addStringOption(option =>
-//         option.setName('longitudinal')
-//             .setDescription('longitude to travel (in miles, positive for east, negative for west)')
-//             .setRequired(true)
-//     );
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-//     .setName('checklocation')
-//     .setDescription("get the player's location on the map")
-//
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-//     .setName('regenmap')
-//     .setDescription("regenerates the map")
-//
-// commands.push(c)
-//
-// c = new SlashCommandBuilder()
-//     .setName('teleport')
-//     .setDescription("Teleport Players to specific latitude and longitude")
-//     .addStringOption(option =>
-//         option.setName('latitude')
-//             .setDescription('lattitude to travel (Negative values for south of the equator)')
-//             .setRequired(true)
-//     )
-//     .addStringOption(option =>
-//         option.setName('longitude')
-//             .setDescription('longitude to travel (Negative Values for West of the prime meridian)')
-//             .setRequired(true)
-//     );
-//
-// commands.push(c)
-
-// var c;
-//
-// c = new SlashCommandBuilder()
-//     .setName('applydamage')
-//     .setDescription("applies custom damage modifiers to any target")
-//     .addStringOption(option =>
-//         option.setName('bodypart')
-//             .setDescription('part to modify')
-//             .setRequired(true)
-//     )
-//     .addStringOption(option =>
-//         option.setName('target')
-//             .setDescription('who to modify')
-//             .setRequired(true)
-//     )
-//     .addStringOption(option =>
-//         option.setName('name')
-//             .setDescription('name of injury/disease')
-//             .setRequired(false)
-//     )
-//     .addNumberOption(option =>
-//         option.setName('damage')
-//             .setDescription('raw damage caused to the part it\'s applied to')
-//             .setRequired(false)
-//     )
-//     .addNumberOption(option =>
-//         option.setName('growth')
-//             .setDescription('rate of progression')
-//             .setRequired(false)
-//     )
-//     .addStringOption(option =>
-//         option.setName('stage')
-//             .setDescription('stage of the injury/disease')
-//             .setRequired(false)
-//     )
-//     .addBooleanOption(option =>
-//         option.setName('spreads')
-//             .setDescription('if it spreads to other body parts')
-//             .setRequired(false)
-//     )
-//     .addNumberOption(option =>
-//         option.setName('spreadrate')
-//             .setDescription('rate it spreads across the body, if applicable')
-//             .setRequired(false)
-//     )
-//     .addNumberOption(option =>
-//         option.setName('softdamage')
-//             .setDescription('damage to the part in only usability, can\'t disable subparts')
-//             .setRequired(false)
-//     )
-//     .addNumberOption(option =>
-//         option.setName('immunity')
-//             .setDescription('progression of disease immunity')
-//             .setRequired(false)
-//     )
-//     .addBooleanOption(option =>
-//         option.setName('unusable')
-//             .setDescription('renders the part unusable regardless of damage')
-//             .setRequired(false)
-//     )
-// commands.push(c)
 
 console.log(commands)
 
