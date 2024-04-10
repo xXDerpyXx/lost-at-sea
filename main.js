@@ -207,16 +207,23 @@ function dist(ax,ay,bx,by){
     return Math.sqrt(((ax-bx)*(ax-bx))+((ay-by)*(ay-by)))
 }
 
-function drawMap(x,y,radius){
+function drawMap(x,y,radius,showingCenter){
+    if(showingCenter == null){
+        showingCenter == false;
+    }
     var output = "";
     for(var j = y-radius; j < y+radius; j++){
         for(var i = x-radius; i < x+radius; i++){
             if(!oob(i,j)){
                 //console.log(dist(y,x,j,i))
-                if(dist(x,y,i,j) <= radius-1){
-                    output += map[i][j].tileChar;
-                }else
-                    output += " "
+                if(i == x && j == y && showingCenter){
+                    output +="¤"
+                }else{
+                    if(dist(x,y,i,j) <= radius-1){
+                        output += map[i][j].tileChar;
+                    }else
+                        output += " "
+                }
             }else
                 output += " "
         }
@@ -847,16 +854,23 @@ client.on('interactionCreate', async (interaction) => {
 
         if(interaction.commandName == "checkmapcolor"){
             var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
-            let mapText = drawMap(coords[0],coords[1],10)
+            let mapText = drawMap(coords[0],coords[1],10,true)
+            let mapTextClean = drawMap(coords[0],coords[1],10,false)
             let msg = await interaction.reply("```ansi\n"+colorifyMap(mapText)+"\n```");
-            /*  map scanner, may become its own command one day in the distant future, leave here for reference
+              //map scanner, may become its own command one day in the distant future, leave here for reference
             let repeats = 0;
-            setInterval(()=>{
-                repeats+=0.1;
-                coords = polarToPlanar(players[pid].latitude,players[pid].longitude+repeats)
-                mapText = drawMap(coords[0],coords[1],10)
+            setTimeout(()=>{
+                msg.edit("```ansi\n"+colorifyMap(mapTextClean)+"\n```")
+            }, 1000);
+            setTimeout(()=>{
                 msg.edit("```ansi\n"+colorifyMap(mapText)+"\n```")
-            }, 500);*/
+            }, 2000);
+            setTimeout(()=>{
+                msg.edit("```ansi\n"+colorifyMap(mapTextClean)+"\n```")
+            }, 3000);
+            setTimeout(()=>{
+                msg.edit("```ansi\n"+colorifyMap(mapText)+"\n```")
+            }, 4000);
         }
 
         if(interaction.commandName == "sleep"){
