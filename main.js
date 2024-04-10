@@ -322,10 +322,21 @@ function colorifyMap(map){
     return coloredmap;
 }
 
+/**
+ * Take a player's latitude and longitude (on the globe) and then transform it to the (flat) map's co odinates
+ *
+ * */
 function polarToPlanar(lat,lon){
-    lat = Math.floor((lat+90)*10)
-    lon = Math.floor((lon+180)*10)
-    return [lon,lat]
+    const y = Math.floor((lat+90)*10) //lat
+    const x = Math.floor((lon+180)*10) //lon
+    return [x,y]
+}
+
+function planarToPolar(x, y){
+    const lat = (x / 10) - 90;
+    const lon = (y / 10) - 180
+
+    return [lon, lat]
 }
 
 function adjustForCurve(lat,lon){
@@ -908,7 +919,18 @@ client.on('interactionCreate', async (interaction) => {
             interaction.reply("This is just a test for now")
         }
         if (interaction.commandName === "checklocation"){
-            interaction.reply(""+getPlayerLocation(pid)+"")
+            let playerX, playerY
+            const playerLatitude = players[pid].latitude;
+            const playerLongitude = players[pid].longitude;
+            [playerX, playerY] = polarToPlanar(playerLatitude, playerLongitude);
+            playerX = Math.floor(playerX);
+            playerY = Math.floor(playerY);
+
+            console.log(playerX, playerY)
+
+             const replyString = `Map Cords : (${playerX}, ${playerY}) . ${getPlayerLocation(pid)}`
+            interaction.reply(replyString)
+            // interaction.reply(""+getPlayerLocation(pid)+"")
         }
         
 
