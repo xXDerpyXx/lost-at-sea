@@ -116,6 +116,9 @@ function getMaxNormalWindSpeed(latitude){
 }
 
 
+/**
+ * vector is in the form [latitude. longitude]
+ * */
 function getWindVector(latitude){
     const latSpeed = getLatitudinalWindSpeed(latitude);
     const lonSpeed = getLongitudnialWindSpeed(latitude)
@@ -131,12 +134,45 @@ function getWindVector(latitude){
     return windspeedVector;
 }
 
-for (let i = 0 ; i < 100 ; i++){
-    let windspeedVector = getWindVector(10)
 
-    console.log(windspeedVector)
+/**
+ * Compute the player's new latitude and longitude drifting after a period of time
+ * @param time (in hours)
+ * @param latitude player's latitude
+ * @param longitude player's longitude
+ * */
+function calculateWindDrift(time, latitude, longitude){
+    const tick = 1 / 12; // Tick every 5 minutes
+    // Calculation timeleft
+    let timeLeft = time;
+
+    //Our Result latitudes and longitudes
+    let newLatitude = latitude;
+    let newLongitude = longitude;
+
+    while (timeLeft > 0){
+        let dt = tick; // dt is the difference of time
+        if (timeLeft < tick){ dt = timeLeft } //acount for remainder time
+
+        let windSpeedVector = getWindVector(latitude);
+        // windspeed is in mph, so multiply it with the dt and divide it by
+        // 69 (miles) which is one degree of longitude or latitude
+        newLatitude += (windSpeedVector[0] * dt) / 69;
+        newLongitude += (windSpeedVector[1] * dt) / 69;
+        console.log(`drifted to [${newLatitude},${newLongitude}]`)
+
+        timeLeft -= dt
+    }
+
+    return [newLatitude, newLongitude]
 }
 
+// for (let i = 0 ; i < 100 ; i++){
+//     let windspeedVector = getWindVector(0)
+//
+//     console.log(windspeedVector)
+// }
 
+calculateWindDrift(10, 28,120)
 
-module.exports = {getMagnitude, getVectorAngle, multiplyVector, getWindVector}
+module.exports = {getMagnitude, getVectorAngle, multiplyVector, getWindVector, calculateWindDrift}
