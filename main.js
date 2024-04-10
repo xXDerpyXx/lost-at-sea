@@ -383,8 +383,12 @@ function generateMap(interaction){
                 }else{
                     if(m[x][y].elevation >= seaLevel-2){
                         m[x][y].tileChar = "."
-                    }else{
+                    }else if(m[x][y].elevation >= seaLevel-4){
                         m[x][y].tileChar = "~"
+                    }else if(m[x][y].elevation >= seaLevel-6){
+                        m[x][y].tileChar = "≡"
+                    }else{
+                        m[x][y].tileChar = "■"
                     }
                 }
             }else if(m[x][y].elevation <= seaLevel+1){
@@ -438,7 +442,7 @@ function drawMap(x,y,radius){
 
 function colorifyMap(map){
     // Consider putting into a different file as a json object
-    ansiColorMapper = {
+    var ansiColorMapper = {
         " ":{
             start: "",
             end:""
@@ -448,6 +452,14 @@ function colorifyMap(map){
             end: "[0m"
         },
         ".":{ // blue
+            start: "[2;34m",
+            end: "[0m"
+        },
+        "≡":{ // blue
+            start: "[2;34m",
+            end: "[0m"
+        },
+        "■":{ // blue
             start: "[2;34m",
             end: "[0m"
         },
@@ -478,7 +490,13 @@ function colorifyMap(map){
     // Our result string
     let coloredmap = "";
     // Set of accepted characters - feel free to extend if there is more characters
-    let characterSetRegex = /[ ~.\-░▒█]/;
+    //let characterSetRegex = /[ ~.\-■░▒█]/;
+    let regString = "["
+    for(var k in ansiColorMapper){
+        regString += "\\"+k
+    }
+    regString += "]"
+    let characterSetRegex = new RegExp(regString)
 
     for (let i = 0 ; i < map.length ; i++){
 
@@ -1053,11 +1071,12 @@ client.on('messageCreate', (msg) => {
 client.on('ready',()=>{
     if(map[1] == null){
         map = generateMap();
+        var coords = polarToPlanar(0,0)
+        var mapText = drawMap(coords[0],coords[1],1800)
+        fs.writeFileSync("map.txt",mapText)
         save()
     }
-    var coords = polarToPlanar(0,0)
-    var mapText = drawMap(coords[0],coords[1],1800)
-    fs.writeFileSync("map.txt",mapText)
+    
 })
 
 var repeats = 0;
@@ -1086,6 +1105,9 @@ client.on('interactionCreate', async (interaction) => {
             if(interaction.commandName == "regenmap"){
                 await interaction.reply("regenerating map")
                 map = generateMap(interaction);
+                var coords = polarToPlanar(0,0)
+                var mapText = drawMap(coords[0],coords[1],1800)
+                fs.writeFileSync("map.txt",mapText)
                 save()
             }
 
