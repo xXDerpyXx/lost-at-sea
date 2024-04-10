@@ -268,9 +268,6 @@ function buildCommands(commandData){
     return commands
 }
 
-
 let commands = buildCommands(commandData);
-
-console.log(commands);
 
 module.exports = commands
