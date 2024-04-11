@@ -183,20 +183,21 @@ class player{
         //this.hunger = 100;
         //this.thirst = 100;
         this.nutrition = {
-            "a":0,
-            "b12":0,
-            "c":0,
-            "e":0,
-            "fe":0,
+            "a":0, // Vitamin A
+            "b12":0, // Vitamin B12
+            "c":0, // Vitamin C
+            "e":0, // Vitamin E
+            "fe":0, // Iron
             "iodine":0,
             "sodium":0,
             "potassium":0,
             "calcium":0,
             "zinc":0,
             "copper":0,
-            "water":0,
-            "calories":0,
+            "water":0, // Thirst level essentially
+            "calories":0, // All activities consume calories
         }
+
         this.sleep = 100;
 
         this.time = 12; //current time of day
