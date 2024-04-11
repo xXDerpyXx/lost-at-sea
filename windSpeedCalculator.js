@@ -159,7 +159,7 @@ function calculateWindDrift(time, latitude, longitude){
         // 69 (miles) which is one degree of longitude or latitude
         newLatitude += (windSpeedVector[0] * dt) / 69;
         newLongitude += (windSpeedVector[1] * dt) / 69;
-        console.log(`drifted to [${newLatitude},${newLongitude}]`)
+        //console.log(`drifted to [${newLatitude},${newLongitude}]`)
 
         timeLeft -= dt
     }

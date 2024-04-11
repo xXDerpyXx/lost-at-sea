@@ -2,6 +2,7 @@ var TOKEN = require("./token.js");
 const baseBody = require("./spine")
 const commands = require("./commandBuilder")
 const generateMap = require("./mapGeneration")
+const windCalc = require("./windSpeedCalculator.js")
 var CLIENT_ID = "738108203505549342"
 var fs = require("fs")
 
@@ -703,6 +704,23 @@ client.on('ready',()=>{
     
 })
 
+function movePlayer(p,lat,lon){
+    p.latitude += lat;
+    p.longitude += lon;
+    [lat,lon] = adjustForCurve(lat,lon)
+    p.latitude = lat;
+    p.longitude = lon;
+    return p;
+}
+
+function autoDrift(p,t){
+    var lat = p.latitude
+    var lon = p.longitude
+    console.log(lat+","+lon)
+    var coords = windCalc.calculateWindDrift(t,lat,lon)
+    return movePlayer(p,coords[0],coords[1])
+}
+
 var repeats = 0;
 
 client.on('interactionCreate', async (interaction) => {
@@ -846,6 +864,7 @@ client.on('interactionCreate', async (interaction) => {
             players[pid].latitude = temp[0]
             players[pid].longitude = temp[1]
             passTime(pid,timeTaken)
+            players[pid] = autoDrift(players[pid],timeTaken)
             if(deadCheck(players[pid].body)[1]){
                 interaction.reply("you died while swimming")
                 return;
@@ -901,6 +920,7 @@ client.on('interactionCreate', async (interaction) => {
                 }else{
                     passTime(pid,parseFloat(interaction.options.getString("hours")))
                     interaction.reply("you have slept "+interaction.options.getString("hours")+" hours");
+                    players[pid] = autoDrift(players[pid],parseFloat(interaction.options.getString("hours")))
                     save(false)
                 }
                 
