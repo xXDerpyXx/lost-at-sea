@@ -208,6 +208,41 @@ function dist(ax,ay,bx,by){
     return Math.sqrt(((ax-bx)*(ax-bx))+((ay-by)*(ay-by)))
 }
 
+function addMapKey(mapText){
+    var key = [
+        ["■","oceanic trench"],
+        ["≡","ocean"],
+        ["~","shallow water"],
+        [".","shoal"],
+        ["§","kelp"],
+        ["-","reef"],
+        ["░","beach"],
+        ["▒","grassland"],
+        ["▓","jungle"],
+        ["█","mountain"]
+    ]
+    var lines = mapText.split("\n")
+    var output = ""
+    for(var i = 0; i < lines.length;i++){
+        output += lines[i]
+        if(i == 0){
+            output += "  ¤:you"
+        }
+        if(i >= 2){
+            for(j = 0; j < key.length; j++){
+                if(mapText.includes(key[j][0])){
+                    var k = key.splice(j,1)[0]
+                    output += "  "+k[0]+":"+k[1]
+                    break;
+                }
+            }
+        }
+        output += "\n"
+    }
+    
+    return output
+}
+
 function drawMap(x,y,radius,showingCenter){
     if(showingCenter == null){
         showingCenter == false;
@@ -228,8 +263,10 @@ function drawMap(x,y,radius,showingCenter){
             }else
                 output += " "
         }
+       
         output +="\n"
     }
+    output = addMapKey(output);
     return output;
 }
 
