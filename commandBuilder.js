@@ -20,15 +20,19 @@ const commandData=
         },
         {
             name: "checkmap",
-            description:"Inspect your local area."
+            description:"Display a map that's around 200 miles wide."
         },
         {
             name: "checkmapcolor",
-            description:"Inspect your local area, but in color."
+            description:"Display a map that's around 200 miles wide, but in color."
         },
         {
             name: "checklocation",
             description:"Return the player's location (coordinates) on the map."
+        },
+        {
+            name: "whereami",
+            description:"Inspect your local area."
         },
         {
             name: "regenmap",

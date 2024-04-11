@@ -381,6 +381,29 @@ function planarToPolar(x, y){
     return [lon, lat]
 }
 
+function biome(lat,lon){
+    var key = [
+        ["■","oceanic trench"],
+        ["≡","ocean"],
+        ["~","shallow water"],
+        [".","shoal"],
+        ["§","kelp"],
+        ["-","reef"],
+        ["░","beach"],
+        ["▒","grassland"],
+        ["▓","jungle"],
+        ["█","mountain"]
+    ]
+    var coords = polarToPlanar(lat,lon)
+    var tile = map[coords[0]][coords[1]].tileChar
+    for(var i = 0; i < key.length;i++){
+        if(key[i][0] == tile){
+            return key[i][1]
+        }
+    }
+    return "hell"
+}
+
 function adjustForCurve(lat,lon){
     while(lat > 90)
         lat-=180
@@ -922,6 +945,12 @@ client.on('interactionCreate', async (interaction) => {
         if(interaction.commandName == "checkmap"){
             var coords = polarToPlanar(players[pid].latitude,players[pid].longitude)
             interaction.reply("```\n"+drawMap(coords[0],coords[1],10)+"\n```")
+        }
+
+
+        if(interaction.commandName == "whereami"){
+            interaction.reply("you look around and seem to be in "+biome(players[pid].latitude,players[pid].longitude))
+            return;
         }
 
         if(interaction.commandName == "checkmapcolor"){
