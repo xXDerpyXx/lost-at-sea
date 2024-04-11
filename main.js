@@ -180,8 +180,23 @@ class player{
         this.longitude = (Math.random()*360)-180
 
         // Internal properties
-        this.hunger = 100;
-        this.thirst = 100;
+        //this.hunger = 100;
+        //this.thirst = 100;
+        this.nutrition = {
+            "a":0,
+            "b12":0,
+            "c":0,
+            "e":0,
+            "fe":0,
+            "iodine":0,
+            "sodium":0,
+            "potassium":0,
+            "calcium":0,
+            "zinc":0,
+            "copper":0,
+            "water":0,
+            "calories":0,
+        }
         this.sleep = 100;
 
         this.time = 12; //current time of day
