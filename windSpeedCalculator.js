@@ -40,6 +40,21 @@ function multiplyVector(vector2D, k){
     )
 }
 
+/**
+ * Generate a*sin(c) + b*cos(d), but a,b,c,d are randomly generated variables
+ *
+ */
+function generateSinCosNoise(){
+    const noiseA = (Math.random() / 2) // [0,0.5] domain
+    const noiseB = (Math.random() / 2) // [0,0.5] domain
+    const noiseC = (Math.random() * Math.PI)
+    const noiseD = (Math.random() * Math.PI)
+
+    const sinNoise = noiseA * Math.sin(noiseC)
+    const cosNoise = noiseB * Math.sin(noiseD)
+
+    return sinNoise + cosNoise
+}
 // theta = arctan(y / x) (theta is in radians btw)
 function getVectorAngle(vector2D){
     return (Math.atan(vector2D[1] / vector2D[0]))
@@ -53,21 +68,17 @@ function getVectorAngle(vector2D){
  */
 function getLongitudnialWindSpeed(latitude){
     //Compute some random noise variables
-    const noiseA = (Math.random() / 2) // [0,0.5] domain
-    const noiseB = (Math.random() / 2) // [0,0.5] domain
-    const noiseC = (Math.random() * Math.PI)
-    const noiseD = (Math.random() * Math.PI)
 
     const northEastTradeWind = generalEx2(-4, 1/10, -15, latitude)
     const southEastTradeWind = generalEx2(-4, 1/10, +15, latitude)
     const westerliesNorth =  generalEx2(4, 1/15, -60, latitude)
     const westerliesSouth =  generalEx2(4, 1/15, +60, latitude)
+    // Polar winds
+    const easterliesNorth = generalEx2(-2, 1/15, -90, latitude)
+    const easterliesSouth = generalEx2(-2, 1/15, +90, latitude)
 
-    const sinNoise = noiseA * Math.sin(latitude + noiseC)
-    const cosNoise = noiseB * Math.sin(latitude + noiseD)
-
-    return (northEastTradeWind + southEastTradeWind + westerliesNorth + westerliesSouth
-        + sinNoise + cosNoise)
+    return (northEastTradeWind + southEastTradeWind + westerliesNorth + westerliesSouth +
+        easterliesNorth + easterliesSouth + generateSinCosNoise())
 }
 
 /**
@@ -77,22 +88,16 @@ function getLongitudnialWindSpeed(latitude){
  *
  */
 function getLatitudinalWindSpeed(latitude){
-    //Compute some random noise variables
-    const noiseA = (Math.random() / 2) // [0,0.5] domain
-    const noiseB = (Math.random() / 2) // [0,0.5] domain
-    const noiseC = (Math.random() * Math.PI)
-    const noiseD = (Math.random() * Math.PI)
-
     const northEastTradeWind = generalEx2(-2, 1/10, -15, latitude)
     const southEastTradeWind = generalEx2(+2, 1/10, +15, latitude)
     const westerliesNorth =  generalEx2(4, 1/15, -60, latitude)
     const westerliesSouth =  generalEx2(-4, 1/15, +60, latitude)
-
-    const sinNoise = noiseA * Math.sin(latitude + noiseC)
-    const cosNoise = noiseB * Math.sin(latitude + noiseD)
+    // Polar winds
+    const easterliesNorth = generalEx2(-3, 1/12, -90, latitude)
+    const easterliesSouth = generalEx2(3, 1/12, +90, latitude)
 
     return (northEastTradeWind + southEastTradeWind + westerliesNorth + westerliesSouth
-        + sinNoise + cosNoise)
+        + easterliesNorth + easterliesSouth + generateSinCosNoise())
 }
 
 /**
@@ -173,6 +178,6 @@ function calculateWindDrift(time, latitude, longitude){
 //     console.log(windspeedVector)
 // }
 
-calculateWindDrift(33, -1,2)
+calculateWindDrift(33, 89,2)
 
 module.exports = {getMagnitude, getVectorAngle, multiplyVector, getWindVector, calculateWindDrift}
