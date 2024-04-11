@@ -83,8 +83,8 @@ function getLatitudinalWindSpeed(latitude){
     const noiseC = (Math.random() * Math.PI)
     const noiseD = (Math.random() * Math.PI)
 
-    const northEastTradeWind = generalEx2(2, 1/10, -15, latitude)
-    const southEastTradeWind = generalEx2(-2, 1/10, +15, latitude)
+    const northEastTradeWind = generalEx2(-2, 1/10, -15, latitude)
+    const southEastTradeWind = generalEx2(+2, 1/10, +15, latitude)
     const westerliesNorth =  generalEx2(4, 1/15, -60, latitude)
     const westerliesSouth =  generalEx2(-4, 1/15, +60, latitude)
 
