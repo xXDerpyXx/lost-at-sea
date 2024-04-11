@@ -282,7 +282,7 @@ function colorifyMap(map){
             end: "[0m"
         },
         ".":{ // blue
-            start: "[2;34m",
+            start: "[2;36m",
             end: "[0m"
         },
         "≡":{ // blue
