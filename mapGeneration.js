@@ -1,3 +1,10 @@
+function oob(x,y){
+    if(x > 0 && x < 3600 && y > 0 && y < 1800){
+        return false;
+    }
+    return true;
+}
+
 function generateMap(interaction){
     var width = 3600
     var height = 1800
@@ -15,7 +22,8 @@ function generateMap(interaction){
                 elevation:110-(Math.random()*20),
                 tileChar:"~",
                 land:false,
-                reef:false
+                r:false,
+                k:false
             }
         }
     }
@@ -116,7 +124,7 @@ function generateMap(interaction){
             for(var y = 0; y < height; y++){
                 if(m[x][y].elevation < seaLevel-1 && m[x][y].elevation > seaLevel-2){
                     if(Math.random() > 0.999){
-                        m[x][y].reef = true;
+                        m[x][y].r = true;
                     }
                 }
             }
@@ -133,7 +141,43 @@ function generateMap(interaction){
                         for(var j = -1; j < 2; j++){
                             if(!oob(x+i,y+j)){
                                 if(m[x+i][y+j].elevation < seaLevel-1 && m[x+i][y+j].elevation > seaLevel-2){
-                                    m[x+i][y+j].reef = true;
+                                    m[x+i][y+j].r = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(interaction != null)
+        interaction.followUp("generating kelp")
+    else
+        console.log("generating kelp")
+    for(var k = 0; k < smoothness; k++){
+        for(var x = 0; x < width; x++){
+            for(var y = 0; y < height; y++){
+                if(m[x][y].elevation < seaLevel-1 && m[x][y].elevation > seaLevel-2){
+                    if(Math.random() > 0.999){
+                        m[x][y].k = true;
+                    }
+                }
+            }
+        }
+    }
+
+    var kelpChecks = 3
+
+    for(var k = 0; k < kelpChecks; k++){
+        for(var x = 0; x < width; x++){
+            for(var y = 0; y < height; y++){
+                if( m[x][y].reef && Math.random() > 0.25){
+                    for(var i = -1; i < 2; i++){
+                        for(var j = -1; j < 2; j++){
+                            if(!oob(x+i,y+j)){
+                                if(m[x+i][y+j].elevation < seaLevel-2 && m[x+i][y+j].elevation > seaLevel-4){
+                                    m[x+i][y+j].k = true;
                                 }
                             }
                         }
@@ -154,8 +198,10 @@ function generateMap(interaction){
             land++;
             if(m[x][y].elevation <= seaLevel){
                 land--;
-                if(m[x][y].reef){
+                if(m[x][y].r){
                     m[x][y].tileChar = "-"
+                }else if(m[x][y].k){
+                    m[x][y].tileChar = "§"
                 }else{
                     if(m[x][y].elevation >= seaLevel-2){
                         m[x][y].tileChar = "."
