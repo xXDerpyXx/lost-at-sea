@@ -172,7 +172,7 @@ function generateMap(interaction){
     for(var k = 0; k < kelpChecks; k++){
         for(var x = 0; x < width; x++){
             for(var y = 0; y < height; y++){
-                if( m[x][y].reef && Math.random() > 0.25){
+                if( m[x][y].k && Math.random() > 0.25){
                     for(var i = -1; i < 2; i++){
                         for(var j = -1; j < 2; j++){
                             if(!oob(x+i,y+j)){
