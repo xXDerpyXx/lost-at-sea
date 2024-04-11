@@ -30,7 +30,7 @@ function getMagnitude(vector2D){
 function getNormalizedVector(vector2D){
     const magnitude = getMagnitude(vector2D);
     return vector2D.map(
-        a => (a * magnitude)
+        a => (a * (1/magnitude))
     );
 }
 
@@ -173,6 +173,6 @@ function calculateWindDrift(time, latitude, longitude){
 //     console.log(windspeedVector)
 // }
 
-calculateWindDrift(10, 28,120)
+calculateWindDrift(33, -1,2)
 
 module.exports = {getMagnitude, getVectorAngle, multiplyVector, getWindVector, calculateWindDrift}
