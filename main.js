@@ -831,7 +831,8 @@ client.on('interactionCreate', async (interaction) => {
             }
         }
         if(interaction.commandName == "getlost"){
-            interaction.reply(randomFromArray(lostMessages))
+            await interaction.reply(randomFromArray(lostMessages))
+            interaction.followUp("you are lost, I am not kidding, you're going to see nothing but ocean on the map for hundreds of miles, land makes up less than 1% of the world")
             // Generate the player properties mapped to their user id
             players[pid] = new player(pid);
             save(false);
