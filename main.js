@@ -438,8 +438,8 @@ function healthBodycheck(b,part){
     if(part == null){
         part = "spine"
     }
-    var tempInfections = [];
-    var isInfected = false;
+    let tempInfections = [];
+    let isInfected = false;
     console.log(part)
     for(var i in b[part].modifiers){
         if(b[part].modifiers[i].spreads){
@@ -448,21 +448,22 @@ function healthBodycheck(b,part){
         }
     }
     for(let p in b[part]){
-        if(p != "hp" && p != "modifiers" && p != "required"){
-            for(var i in b[part][p].modifiers){
+        console.log("part : " + p);
+        if(p !== "hp" && p !== "modifiers" && p !== "required"){
+            for(let i in b[part][p].modifiers){
                 if(b[part][p].modifiers[i].spreads){
                     if(Math.random() < b[part][p].modifiers[i].spreadRate){
                         b[part] = applyModifier(b,part,b[part][p].modifiers[i])
                     }
                 }
             }
-            for(var i in b[part][p].modifiers){
+            for(let i in b[part][p].modifiers){
                 if(b[part][p].modifiers[i].growth > 0){
-                    b[part][p].modifiers[i].damage += b[part][p].modifiers[i].growth
+                    b[part][p].modifiers[i].damage += b[part][p].modifiers[i].growth;
                 }
             }
             if(isInfected){
-                for(var i in tempInfections){
+                for(let i in tempInfections){
                     if(Math.random() < tempInfections[i].spreadRate){
                         b[part] = applyModifier(b[part],p,tempInfections[i])
                     }
