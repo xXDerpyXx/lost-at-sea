@@ -574,8 +574,9 @@ function splitCodeBlocks(s){
     let sByLine = s.split("\n") // is now an array of strings, split by \n
 
     let postString = "";
-    for (let i in sByLine){
-        if (postString.length < 1950 && postString.length + sByLine[i].length >= 1950){
+    for (let i = 0 ; i < sByLine.length ; i++){
+        // console.log(`poststring length: ${postString.length}`)
+        if (postString.length < 1900 && postString.length + sByLine[i].length >= 1900){
             stringChunks.push("```"+postString+"```")
             postString = ""; //reset the string
         } else {
@@ -583,6 +584,10 @@ function splitCodeBlocks(s){
         }
     }
 
+    // push the final stringchunks
+    stringChunks.push("```"+postString+"```")
+
+    console.log(stringChunks.length)
     return stringChunks
 }
 
@@ -1087,7 +1092,7 @@ client.on('interactionCreate', async (interaction) => {
 
         if(interaction.commandName == "checkbody"){
             //await interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
-            var replyParts = splitCodeBlocks(bodyToString(players[pid].body))
+            var replyParts = splitCodeBlocks( bodyToString(players[pid].body) )
             await interaction.reply(replyParts[0]);
             for(var i = 1; i < replyParts.length; i++){
                 await interaction.followUp(replyParts[i])
