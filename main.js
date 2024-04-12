@@ -569,11 +569,17 @@ function getSubBodyPartCount(bodyPart){
  * Split a code block to 2000 character chunks
  * */
 function splitCodeBlocks(s){
+    // Our result string
     let stringChunks = []
-    const chunkSize = 1900; // Slightly less to leave a buffer
-    for (let i = 0; i < s.length ; i += chunkSize){
-        // Wrap it in discord's code block notatoin
-        stringChunks.push( "```"+s.slice(i, i + chunkSize)+"```")
+    let sByLine = s.split("\n") // is now an array of strings, split by \n
+
+    const chunkSize = 1950; // Slightly less to leave a buffer
+    for (let line of sByLine){
+        let postString = "";
+        while (postString.length < chunkSize){
+            postString += (line + "\n"); // re add the \n
+        }
+        stringChunks.push("```"+postString+"```")
     }
 
     return stringChunks
