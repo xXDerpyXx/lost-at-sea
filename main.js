@@ -450,7 +450,7 @@ function healthBodycheck(b,part){
     for(let p in b[part]){
         if(p != "hp" && p != "modifiers" && p != "required"){
             for(var i in b[part][p].modifiers){
-                if(b[part][p].modifiers[i].spreads){
+                if(b[part][p].modifiers[i].spreads && !hasModifier(b[part],b[part][p].modifiers[i].name)){
                     if(Math.random() < b[part][p].modifiers[i].spreadRate){
                         b = applyModifier(b,part,b[part][p].modifiers[i])
                     }
@@ -463,7 +463,7 @@ function healthBodycheck(b,part){
             }
             if(isInfected){
                 for(let i in tempInfections){
-                    if(Math.random() < tempInfections[i].spreadRate){
+                    if(Math.random() < tempInfections[i].spreadRate  && !hasModifier(b[part][p],tempInfections[i].name)){
                         b = applyModifier(b,p,tempInfections[i])
                     }
                 }
@@ -642,7 +642,6 @@ function bodyToString(body,partName,layer,layerString){
  * */
 function applyModifier(bodyPart,targetPart,modifier){
 
-    console.log("Bruh maybe it enters the function")
     if(targetPart == "this"){
         bodyPart.modifiers.push(modifier)
     }else{
@@ -651,13 +650,9 @@ function applyModifier(bodyPart,targetPart,modifier){
             if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
                 if(subBodyPart === targetPart){
                     // Body part found, apply the modifier!
-                    console.log("found body part gonna push")
-                    console.log(`${JSON.stringify(bodyPart[subBodyPart].modifiers)}`)
-                    console.log(`${JSON.stringify(modifier)}`)
                     bodyPart[subBodyPart].modifiers.push(modifier)
                 }else{
                     // Recursive case, perform your BFS until you find the body aprt
-                    console.log("gonna recurse")
                     bodyPart[subBodyPart] = applyModifier(bodyPart[subBodyPart],targetPart,modifier)
                 }
             }
@@ -665,6 +660,15 @@ function applyModifier(bodyPart,targetPart,modifier){
     }
     
     return bodyPart;
+}
+
+function hasModifier(bodyPart,modName){
+    for(var i = 0; i < bodyPart.modifiers.length; i++){
+        if(bodyPart.modifiers[i].name == modName){
+            return true;
+        }
+    }
+    return false;
 }
 
 function complexDamage(t,mod,bodyPart,r){
