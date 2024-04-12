@@ -434,16 +434,46 @@ function adjustForCurve(lat,lon){
 }
 
 
-function healthTick(b,part){
+function healthBodycheck(b,part){
     if(part == null){
         part = "spine"
     }
+    var tempInfections = [];
+    var isInfected = false;
+    for(var i in b[part].modifiers){
+        if(b[part].modifiers[i].spreads){
+            isInfected = true;
+            tempInfections.push(b[part].modifiers[i])
+        }
+    }
     for(var p in b[part]){
         if(p != "hp" && p != "modifiers" && p != "required"){
-            b[part] = healthTick(b[part],p)
+            console.log(p+": ")
+            console.log(b[part])
+            for(var i in b[part][p].modifiers){
+                if(b[part][p].modifiers[i].spreads){
+                    if(Math.random() < b[part][p].modifiers[i].spreadRate){
+                        b[part].modifiers.push(b[part][p].modifiers[i])
+                    }
+                }
+            }
+            if(isInfected){
+                for(var i in tempInfections){
+                    if(Math.random() < tempInfections[i].spreadRate){
+                        b[part][p].modifiers.push(tempInfections[i])
+                    }
+                }
+            }
+            b[part] = healthBodycheck(b[part],p)
         }
     }
     return b[part]
+}
+
+function healthTick(p){
+    p.body = healthBodycheck(p.body)
+
+    return p
 }
 
 function deadCheck(b,part){
@@ -674,7 +704,11 @@ function applyComplexDamage(t,mod,bodyPart,r,targetPart){
 function passTime(id,hours){
     players[id].time += hours;
     players[id].constantTime += hours;
-
+    var tempHours = hours
+    while(tempHours > 0){
+        players[id] = healthTick(players[id])
+        tempHours -= 1/12
+    }
     // Account for hours
     while(players[id].time > 24){
         players[id].time -= 24;
