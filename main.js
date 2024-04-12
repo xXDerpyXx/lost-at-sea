@@ -452,7 +452,7 @@ function healthBodycheck(b,part){
             for(var i in b[part][p].modifiers){
                 if(b[part][p].modifiers[i].spreads){
                     if(Math.random() < b[part][p].modifiers[i].spreadRate){
-                        b[part] = applyModifier(b,part,b[part][p].modifiers[i])
+                        b = applyModifier(b,part,b[part][p].modifiers[i])
                     }
                 }
             }
@@ -464,7 +464,7 @@ function healthBodycheck(b,part){
             if(isInfected){
                 for(var i in tempInfections){
                     if(Math.random() < tempInfections[i].spreadRate){
-                        b[part] = applyModifier(b[part],p,tempInfections[i])
+                        b = applyModifier(b,p,tempInfections[i])
                     }
                 }
             }
