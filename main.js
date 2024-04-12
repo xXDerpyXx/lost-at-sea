@@ -440,7 +440,7 @@ function healthBodycheck(b,part){
     }
     let tempInfections = [];
     let isInfected = false;
-    console.log(part)
+    //console.log(part)
     for(var i in b[part].modifiers){
         if(b[part].modifiers[i].spreads){
             isInfected = true;
@@ -627,7 +627,7 @@ function bodyToString(body,partName,layer,layerString){
     if(getBodyPartHp(body[partName])[0] == 0)
         return finalString+" destroyed!"
     else if(getBodyPartHp(body[partName])[1] == 0)
-        return finalString+" disabled!"
+        finalString+" disabled!"
     let partsDone = 0;
     let totalParts = getSubBodyPartCount(body[partName]);
 
