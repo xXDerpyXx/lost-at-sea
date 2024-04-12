@@ -455,6 +455,11 @@ function healthBodycheck(b,part){
                     }
                 }
             }
+            for(var i in b[part][p].modifiers){
+                if(b[part][p].modifiers[i].growth > 0){
+                    b[part][p].modifiers[i].damage += b[part][p].modifiers[i].growth
+                }
+            }
             if(isInfected){
                 for(var i in tempInfections){
                     if(Math.random() < tempInfections[i].spreadRate){
