@@ -578,7 +578,7 @@ function splitCodeBlocks(s){
         // console.log(`poststring length: ${postString.length}`)
         if (postString.length < 1900 && postString.length + sByLine[i].length >= 1900){
             stringChunks.push("```"+postString+"```")
-            postString = ""; //reset the string
+            postString = (sByLine[i] + "\n"); //reset the string
         } else {
             postString += (sByLine[i] + "\n");
         }
