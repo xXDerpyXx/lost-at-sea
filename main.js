@@ -565,6 +565,20 @@ function getSubBodyPartCount(bodyPart){
     return count;
 }
 
+/**
+ * Split a code block to 2000 character chunks
+ * */
+function splitCodeBlocks(s){
+    let stringChunks = []
+    const chunkSize = 1900; // Slightly less to leave a buffer
+    for (let i = 0; i < s.length ; i += chunkSize){
+        // Wrap it in discord's code block notatoin
+        stringChunks.push( "```"+s.slice(i, i + chunkSize)+"```")
+    }
+
+    return stringChunks
+}
+
 function bodyToString(body,partName,layer,layerString){
     var finalString = "" // Result
 
