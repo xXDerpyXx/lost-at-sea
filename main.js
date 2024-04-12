@@ -573,13 +573,14 @@ function splitCodeBlocks(s){
     let stringChunks = []
     let sByLine = s.split("\n") // is now an array of strings, split by \n
 
-    const chunkSize = 1950; // Slightly less to leave a buffer
-    for (let line of sByLine){
-        let postString = "";
-        while (postString.length < chunkSize){
-            postString += (line + "\n"); // re add the \n
+    let postString = "";
+    for (let i in sByLine){
+        if (postString.length + sByLine[i].length > 1980){
+            stringChunks.push("```"+postString+"```")
+            postString = ""; //reset the string
+        } else {
+            postString += (sByLine[i] + "\n");
         }
-        stringChunks.push("```"+postString+"```")
     }
 
     return stringChunks
