@@ -1086,7 +1086,12 @@ client.on('interactionCreate', async (interaction) => {
         }
 
         if(interaction.commandName == "checkbody"){
-            await interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
+            //await interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
+            var replyParts = splitCodeBlocks(bodyToString(players[pid].body))
+            await interaction.reply(replyParts[0]);
+            for(var i = 1; i < replyParts.length; i++){
+                await interaction.followUp(replyParts[i])
+            }
             await interaction.followUp("```\n* means the part is required, if hp reaches 0%, you instantly die```")
             return;
         }
