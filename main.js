@@ -438,8 +438,8 @@ function healthBodycheck(b,part){
     if(part == null){
         part = "spine"
     }
-    var tempInfections = [];
-    var isInfected = false;
+    let tempInfections = [];
+    let isInfected = false;
     console.log(part)
     for(var i in b[part].modifiers){
         if(b[part].modifiers[i].spreads){
@@ -456,13 +456,13 @@ function healthBodycheck(b,part){
                     }
                 }
             }
-            for(var i in b[part][p].modifiers){
+            for(let i in b[part][p].modifiers){
                 if(b[part][p].modifiers[i].growth > 0){
-                    b[part][p].modifiers[i].damage += b[part][p].modifiers[i].growth
+                    b[part][p].modifiers[i].damage += b[part][p].modifiers[i].growth;
                 }
             }
             if(isInfected){
-                for(var i in tempInfections){
+                for(let i in tempInfections){
                     if(Math.random() < tempInfections[i].spreadRate){
                         b = applyModifier(b,p,tempInfections[i])
                     }
@@ -641,6 +641,8 @@ function bodyToString(body,partName,layer,layerString){
  * @return bodyPart the base bodyPart, now modified from the function.
  * */
 function applyModifier(bodyPart,targetPart,modifier){
+
+    console.log("Bruh maybe it enters the function")
     if(targetPart == "this"){
         bodyPart.modifiers.push(modifier)
     }else{
@@ -649,9 +651,13 @@ function applyModifier(bodyPart,targetPart,modifier){
             if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
                 if(subBodyPart === targetPart){
                     // Body part found, apply the modifier!
+                    console.log("found body part gonna push")
+                    console.log(`${JSON.stringify(bodyPart[subBodyPart].modifiers)}`)
+                    console.log(`${JSON.stringify(modifier)}`)
                     bodyPart[subBodyPart].modifiers.push(modifier)
                 }else{
                     // Recursive case, perform your BFS until you find the body aprt
+                    console.log("gonna recurse")
                     bodyPart[subBodyPart] = applyModifier(bodyPart[subBodyPart],targetPart,modifier)
                 }
             }
