@@ -440,6 +440,7 @@ function healthBodycheck(b,part){
     }
     var tempInfections = [];
     var isInfected = false;
+    console.log(part)
     for(var i in b[part].modifiers){
         if(b[part].modifiers[i].spreads){
             isInfected = true;
