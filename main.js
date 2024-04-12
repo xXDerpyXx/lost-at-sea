@@ -446,28 +446,26 @@ function healthBodycheck(b,part){
             tempInfections.push(b[part].modifiers[i])
         }
     }
-    for(var p in b[part]){
+    for(let p in b[part]){
         if(p != "hp" && p != "modifiers" && p != "required"){
-            console.log(p+": ")
-            console.log(b[part])
             for(var i in b[part][p].modifiers){
                 if(b[part][p].modifiers[i].spreads){
                     if(Math.random() < b[part][p].modifiers[i].spreadRate){
-                        b[part].modifiers.push(b[part][p].modifiers[i])
+                        b[part] = applyModifier(b,part,b[part][p].modifiers[i])
                     }
                 }
             }
             if(isInfected){
                 for(var i in tempInfections){
                     if(Math.random() < tempInfections[i].spreadRate){
-                        b[part][p].modifiers.push(tempInfections[i])
+                        b[part] = applyModifier(b[part],p,tempInfections[i])
                     }
                 }
             }
             b[part] = healthBodycheck(b[part],p)
         }
     }
-    return b[part]
+    return b
 }
 
 function healthTick(p){
