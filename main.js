@@ -575,7 +575,7 @@ function splitCodeBlocks(s){
 
     let postString = "";
     for (let i in sByLine){
-        if (postString.length < 1950 && postString.length + sByLine[i].length > 1950){
+        if (postString.length < 1950 && postString.length + sByLine[i].length >= 1950){
             stringChunks.push("```"+postString+"```")
             postString = ""; //reset the string
         } else {
