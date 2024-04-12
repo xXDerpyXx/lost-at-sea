@@ -154,6 +154,7 @@ class modifier{
         this.name = n; // name of the injury/disease (bruise/scratch/polio/etc)
         this.damage = 0; // flat rate damage done to body part when modifier is applied
         this.growth = 0; // rate that damage increases during medical check
+        this.softGrowth = 0; // same thing for soft damage
         this.stage = "malignant"; // stage of cancer/infection/disease (malignant/immune/etc)
         this.spreads = false; // spreads to other body parts?
         this.spreadRate = 0; // chance of spreading during medical tick
@@ -459,6 +460,12 @@ function healthBodycheck(b,part){
             for(let i in b[part][p].modifiers){
                 if(b[part][p].modifiers[i].growth > 0){
                     b[part][p].modifiers[i].damage += b[part][p].modifiers[i].growth;
+                }
+            }
+
+            for(let i in b[part][p].modifiers){
+                if(b[part][p].modifiers[i].softGrowth > 0){
+                    b[part][p].modifiers[i].softDamage += b[part][p].modifiers[i].softGrowth;
                 }
             }
             if(isInfected){
@@ -960,6 +967,8 @@ client.on('interactionCreate', async (interaction) => {
                     mod.damage = interaction.options.getNumber("damage")
                 if(interaction.options.getNumber("growth"))
                     mod.growth = interaction.options.getNumber("growth")
+                if(interaction.options.getNumber("softgrowth"))
+                    mod.softGrowth = interaction.options.getNumber("softgrowth")
                 if(interaction.options.getString("stage"))
                     mod.stage = interaction.options.getString("stage")
                 if(interaction.options.getBoolean("spreads"))

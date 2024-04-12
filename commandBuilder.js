@@ -182,6 +182,12 @@ const commandData=
                     required: false
                 },
                 {
+                    type:"number",
+                    name:"softgrowth",
+                    description: "The rate of soft damage progression'",
+                    required: false
+                },
+                {
                     type:"string",
                     name:"stage",
                     description: "Stage of the injury/dissease",
