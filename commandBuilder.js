@@ -19,6 +19,10 @@ const commandData=
             description:"Inspect the state of your body."
         },
         {
+            name: "checkhealth",
+            description:"Check just medical problems, and nutritional information."
+        },
+        {
             name: "checkmap",
             description:"Display a map that's around 200 miles wide."
         },

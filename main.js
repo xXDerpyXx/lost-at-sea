@@ -184,19 +184,19 @@ class player{
         //this.hunger = 100;
         //this.thirst = 100;
         this.nutrition = {
-            "a":0, // Vitamin A
-            "b12":0, // Vitamin B12
-            "c":0, // Vitamin C
-            "e":0, // Vitamin E
-            "fe":0, // Iron
-            "iodine":0,
-            "sodium":0,
-            "potassium":0,
-            "calcium":0,
-            "zinc":0,
-            "copper":0,
-            "water":0, // Thirst level essentially
-            "calories":0, // All activities consume calories
+            "a":1800, //micrograms // Vitamin A
+            "b12":4.8, //micrograms // Vitamin B12
+            "c":160, //miligrams // Vitamin C
+            "e":30, //miligrams // Vitamin E
+            "fe":24, //miligrams // Iron
+            "iodine":300, // micrograms
+            "sodium":1000, // miligrams
+            "potassium":6000, //miligrams
+            "calcium":2000, //miligrams
+            "zinc":20, //miligrams
+            "copper":1800, //micrograms
+            "water":4000, //grams // Thirst level essentially
+            "calories":4000, //kCal // All activities consume calories
         }
 
         this.sleep = 100;
@@ -517,6 +517,33 @@ function deadCheck(b,part){
     return [b[part],dead]
 }
 
+function getAllModifiersString(b,part){
+    var output = ""
+    if(part == null){
+        part = "spine"
+    }
+    if(b[part].modifiers.length > 0){
+        output += part+": "
+    }
+    
+    for(var i = 0; i < b[part].modifiers.length; i++){
+        output += b[part].modifiers[i].name
+        if(i < b[part].modifiers.length-1)
+            output += ", "
+    }
+    if(b[part].modifiers.length > 0){
+        output += "\n"
+    }
+    
+
+    for(var p in b[part]){
+        if(p != "hp" && p != "modifiers" && p != "required"){
+            output += getAllModifiersString(b[part],p);
+        }
+    }
+    return output
+}
+
 /**
  * Compute the HP (and softHP) of a body part
  *
@@ -634,7 +661,7 @@ function bodyToString(body,partName,layer,layerString){
     if(getBodyPartHp(body[partName])[0] == 0)
         return finalString+" destroyed!"
     else if(getBodyPartHp(body[partName])[1] == 0)
-        finalString+" disabled!"
+        finalString+=" disabled!"
     let partsDone = 0;
     let totalParts = getSubBodyPartCount(body[partName]);
 
@@ -753,6 +780,7 @@ function passTime(id,hours){
     players[id].constantTime += hours;
     var tempHours = hours
     while(tempHours > 0){
+        players[id] = nutritionTick(players[id])
         players[id] = healthTick(players[id])
         tempHours -= 1/12
     }
@@ -761,6 +789,79 @@ function passTime(id,hours){
         players[id].time -= 24;
         players[id].daysAtSea+=1
     }
+}
+
+function nutritionTick(p){
+    var nutritionUsage = {
+        "a":900, //micrograms // Vitamin A
+        "b12":2.4, //micrograms // Vitamin B12
+        "c":80, //miligrams // Vitamin C
+        "e":15, //miligrams // Vitamin E
+        "fe":12, //miligrams // Iron
+        "iodine":150, // micrograms
+        "sodium":500, // miligrams
+        "potassium":3000, //miligrams
+        "calcium":1000, //miligrams
+        "zinc":10, //miligrams
+        "copper":900, //micrograms
+        "water":2000, //grams // Thirst level essentially
+        "calories":2000, //kCal // All activities consume calories
+    }
+
+    var accuracy = 1000000;
+
+    for(var k in nutritionUsage){
+        p.nutrition[k] -= Math.floor(((nutritionUsage[k]/24)/12)*accuracy)/accuracy
+    }
+    return p;
+}
+
+function padd(string,length){
+    while(string.length < length){
+        string += " "
+    }
+    return string
+}
+
+function nutritionString(p){
+    var units = {
+        "a":"μg", // Vitamin A
+        "b12":"μg", // Vitamin B12
+        "c":"mg", // Vitamin C
+        "e":"mg", // Vitamin E
+        "fe":"mg", // Iron
+        "iodine":"μg",
+        "sodium":"mg",
+        "potassium":"mg",
+        "calcium":"mg",
+        "zinc":"mg",
+        "copper":"μg",
+        "water":"g", // Thirst level essentially
+        "calories":"kCal", // All activities consume calories
+    }
+
+    var dailyValue = {
+        "a":900, //micrograms // Vitamin A
+        "b12":2.4, //micrograms // Vitamin B12
+        "c":80, //miligrams // Vitamin C
+        "e":15, //miligrams // Vitamin E
+        "fe":12, //miligrams // Iron
+        "iodine":150, // micrograms
+        "sodium":500, // miligrams
+        "potassium":3000, //miligrams
+        "calcium":1000, //miligrams
+        "zinc":10, //miligrams
+        "copper":900, //micrograms
+        "water":2000, //grams // Thirst level essentially
+        "calories":2000, //kCal // All activities consume calories
+    }
+    var output = ""
+    output += padd("nutrient",11)+padd("absorbed",10)+"percentage of daily usage\n"
+    for(var k in p.nutrition){
+        var dailyValuePercent = Math.floor((p.nutrition[k]/dailyValue[k])*100)
+        output += padd(k+": ",11)+padd(Math.round(p.nutrition[k])+" ",5)+padd(units[k]+" ",5)+dailyValuePercent+"%\n"
+    }
+    return output
 }
 
 function getPlayerLocation(id){
@@ -1101,12 +1202,21 @@ client.on('interactionCreate', async (interaction) => {
 
         if(interaction.commandName == "checkbody"){
             //await interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
-            var replyParts = splitCodeBlocks( bodyToString(players[pid].body) )
+            var replyParts = splitCodeBlocks( bodyToString(players[pid].body)+"\n\n* means the part is required, if hp reaches 0%, you instantly die\n\nNourishment\n────────────────────\n"+nutritionString(players[pid]) )
             await interaction.reply(replyParts[0]);
             for(var i = 1; i < replyParts.length; i++){
                 await interaction.followUp(replyParts[i])
             }
-            await interaction.followUp("```\n* means the part is required, if hp reaches 0%, you instantly die```")
+            return;
+        }
+
+        if(interaction.commandName == "checkhealth"){
+            //await interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
+            var replyParts = splitCodeBlocks( getAllModifiersString(players[pid].body)+"\n\nNourishment\n────────────────────\n"+nutritionString(players[pid]) )
+            await interaction.reply(replyParts[0]);
+            for(var i = 1; i < replyParts.length; i++){
+                await interaction.followUp(replyParts[i])
+            }
             return;
         }
 
