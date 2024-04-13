@@ -87,7 +87,7 @@ body = {
     },
     leftLung:{hp:5,modifiers:[]},
     rightLung:{hp:5,modifiers:[]},
-    stomach:{hp:5,modifiers:[]},
+    stomach:{hp:5,modifiers:[],required:true},
     liver:{hp:5,modifiers:[]}
 },
     lowerTorso:{

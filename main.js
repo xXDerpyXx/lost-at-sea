@@ -192,7 +192,7 @@ class player{
             "iodine":300, // micrograms
             "sodium":1000, // miligrams
             "potassium":6000, //miligrams
-            "calcium":2000, //miligrams
+            "calcium":300, //miligrams
             "zinc":20, //miligrams
             "copper":1800, //micrograms
             "water":4000, //grams // Thirst level essentially
@@ -801,7 +801,7 @@ function nutritionTick(p){
         "iodine":150, // micrograms
         "sodium":500, // miligrams
         "potassium":3000, //miligrams
-        "calcium":1000, //miligrams
+        "calcium":150, //miligrams
         "zinc":10, //miligrams
         "copper":900, //micrograms
         "water":2000, //grams // Thirst level essentially
@@ -812,6 +812,22 @@ function nutritionTick(p){
 
     for(var k in nutritionUsage){
         p.nutrition[k] -= Math.floor(((nutritionUsage[k]/24)/12)*accuracy)/accuracy
+    }
+    
+    if(p.nutrition.calories <= 0 ){
+        var alreadyStarving = false;
+        for(var i = 0; i < p.body.spine.chest.stomach.modifiers.length; i++){
+            if(p.body.spine.chest.stomach.modifiers[i].name == "starving"){
+                alreadyStarving = true
+                break;
+            }
+        }
+        if(!alreadyStarving){
+            var tempMod = new modifier("starving")
+            tempMod.damage = 0
+            tempMod.growth = 0.00082671
+            p.body.spine.chest.stomach = applyModifier(p.body.spine.chest.stomach,"this",tempMod)
+        }
     }
     return p;
 }
@@ -856,11 +872,18 @@ function nutritionString(p){
         "iodine":150, // micrograms
         "sodium":500, // miligrams
         "potassium":3000, //miligrams
-        "calcium":1000, //miligrams
+        "calcium":150, //miligrams
         "zinc":10, //miligrams
         "copper":900, //micrograms
         "water":2000, //grams // Thirst level essentially
         "calories":2000, //kCal // All activities consume calories
+    }
+
+    var overdoseLevels = {
+        "copper":70000,
+        "iron":25,
+        "zinc":40,
+        "calcium":700
     }
 
     var commonNames = {
@@ -882,16 +905,20 @@ function nutritionString(p){
     output += padd("Nutrient",14)+padd("Reserve",10)+"Percentage of Daily Usage\n"
     for(var k in p.nutrition){
         var dailyValuePercent = Math.floor((p.nutrition[k]/dailyValue[k])*100)
-        output += padd(commonNames[k],11)+" : "+colorBasedOnPercent(padd(Math.round(p.nutrition[k])+" ",5),dailyValuePercent)+padd(units[k]+" ",5)+padd(dailyValuePercent+"%",6)
+        output += padd(commonNames[k],11)+" : "+colorBasedOnPercent(padd(Math.round(p.nutrition[k])+" ",5),dailyValuePercent,k)+padd(units[k]+" ",5)+padd(dailyValuePercent+"%",6)
         if(dailyValuePercent <= 0){
             output += "malnourished!"
+        }
+        if(overdoseLevels[k] != null){
+            if(overdoseLevels[k] <= p.nutrition[k])
+                output += "overdosing!"
         }
         output += "\n"
     }
     return output
 }
 
-function colorBasedOnPercent(string,percent){
+function colorBasedOnPercent(string,percent,nutrient){
     if(percent < 10){
         return "[2;31m"+string+"[0m" //red
     }
@@ -901,6 +928,19 @@ function colorBasedOnPercent(string,percent){
     if(percent < 100){
         return "[2;32m"+string+"[0m" //green
     }
+    if(percent < 200){
+        return "[2;36m"+string+"[0m" //teal
+    }
+    if(nutrient == "copper" && percent >= 7700){
+        return "[2;35m"+string+"[0m" // pink
+    }
+    if(nutrient == "zinc" && percent >= 400){
+        return "[2;35m"+string+"[0m" // pink
+    }
+    if(nutrient == "calcium" && percent >= 466){
+        return "[2;35m"+string+"[0m" // pink
+    }
+
     return "[2;34m"+string+"[0m" //blue
 }
 
@@ -1018,7 +1058,7 @@ function movePlayer(p,lat,lon){
 function autoDrift(p,t){
     var lat = p.latitude
     var lon = p.longitude
-    console.log(lat+","+lon)
+    //console.log(lat+","+lon)
     var coords = windCalc.calculateWindDrift(t,lat,lon)
     return movePlayer(p,coords[0],coords[1])
 }
@@ -1163,18 +1203,28 @@ client.on('interactionCreate', async (interaction) => {
             plat = lat/100; //latitude in degrees
             var distance = dist(players[pid].longitude,players[pid].latitude,players[pid].longitude+plon,players[pid].latitude+plat)
             var timeTaken = (distance*100)*(1/players[pid].swimmingSpeed)
-            players[pid].longitude += plon
-            players[pid].latitude -= plat
-            var temp = adjustForCurve(players[pid].latitude,players[pid].longitude)
-            players[pid].latitude = temp[0]
-            players[pid].longitude = temp[1]
-            passTime(pid,timeTaken)
-            players[pid] = autoDrift(players[pid],timeTaken)
-            if(deadCheck(players[pid].body)[1]){
-                interaction.reply("you died while swimming")
-                return;
+            var intervals = timeTaken*12
+            var oLon = players[pid].longitude
+            var oLat = players[pid].latitude
+            for(var i = 0; i < intervals; i++){
+                players[pid].longitude += plon/intervals
+                players[pid].latitude -= plat/intervals
+                var temp = adjustForCurve(players[pid].latitude,players[pid].longitude)
+                players[pid].latitude = temp[0]
+                players[pid].longitude = temp[1]
+                passTime(pid,1/12)
+                players[pid] = autoDrift(players[pid],1/12)
+                if(deadCheck(players[pid].body)[1]){
+                    interaction.reply("you died while swimming")
+                    return;
+                }
             }
-            const distanceMiles = (distance*100).toFixed(2)
+            
+            
+            
+            
+            
+            const distanceMiles = (dist(players[pid].longitude,players[pid].latitude,oLon,oLat)*100).toFixed(2)
             interaction.reply(
             `You travelled ${distanceMiles} miles (${mileToKm(distanceMiles)}km) and it took ${formatLengthOfTime(timeTaken)}!`
             )
