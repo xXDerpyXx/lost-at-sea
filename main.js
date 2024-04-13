@@ -611,7 +611,7 @@ function splitCodeBlocks(s){
     for (let i = 0 ; i < sByLine.length ; i++){
         // console.log(`poststring length: ${postString.length}`)
         if (postString.length < 1900 && postString.length + sByLine[i].length >= 1900){
-            stringChunks.push("```"+postString+"```")
+            stringChunks.push("```ansi\n"+postString+"```")
             postString = (sByLine[i] + "\n"); //reset the string
         } else {
             postString += (sByLine[i] + "\n");
@@ -619,7 +619,7 @@ function splitCodeBlocks(s){
     }
 
     // push the final stringchunks
-    stringChunks.push("```"+postString+"```")
+    stringChunks.push("```ansi\n"+postString+"```")
 
     console.log(stringChunks.length)
     return stringChunks
@@ -816,11 +816,18 @@ function nutritionTick(p){
     return p;
 }
 
-function padd(string,length){
+function padd(string,length,filler){
+    if(filler == undefined){
+        filler = " "
+    }
     while(string.length < length){
-        string += " "
+        string += filler
     }
     return string
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function nutritionString(p){
@@ -855,13 +862,46 @@ function nutritionString(p){
         "water":2000, //grams // Thirst level essentially
         "calories":2000, //kCal // All activities consume calories
     }
+
+    var commonNames = {
+        "a":"Vitamin A",
+        "b12":"Vitamin B12", 
+        "c":"Vitamin C", 
+        "e":"Vitamin E",
+        "fe":"Iron", 
+        "iodine":"Iodine",
+        "sodium":"Sodium", 
+        "potassium":"Potassium",
+        "calcium":'Calcium', 
+        "zinc":"Zinc", 
+        "copper":"Copper", 
+        "water":"Water", 
+        "calories":"Calories",
+    }
     var output = ""
-    output += padd("nutrient",11)+padd("absorbed",10)+"percentage of daily usage\n"
+    output += padd("Nutrient",14)+padd("Reserve",10)+"Percentage of Daily Usage\n"
     for(var k in p.nutrition){
         var dailyValuePercent = Math.floor((p.nutrition[k]/dailyValue[k])*100)
-        output += padd(k+": ",11)+padd(Math.round(p.nutrition[k])+" ",5)+padd(units[k]+" ",5)+dailyValuePercent+"%\n"
+        output += padd(commonNames[k],11)+" : "+colorBasedOnPercent(padd(Math.round(p.nutrition[k])+" ",5),dailyValuePercent)+padd(units[k]+" ",5)+padd(dailyValuePercent+"%",6)
+        if(dailyValuePercent <= 0){
+            output += "malnourished!"
+        }
+        output += "\n"
     }
     return output
+}
+
+function colorBasedOnPercent(string,percent){
+    if(percent < 10){
+        return "[2;31m"+string+"[0m" //red
+    }
+    if(percent < 50){
+        return "[2;33m"+string+"[0m" //yellow
+    }
+    if(percent < 100){
+        return "[2;32m"+string+"[0m" //green
+    }
+    return "[2;34m"+string+"[0m" //blue
 }
 
 function getPlayerLocation(id){
@@ -1202,7 +1242,7 @@ client.on('interactionCreate', async (interaction) => {
 
         if(interaction.commandName == "checkbody"){
             //await interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
-            var replyParts = splitCodeBlocks( bodyToString(players[pid].body)+"\n\n* means the part is required, if hp reaches 0%, you instantly die\n\nNourishment\n────────────────────\n"+nutritionString(players[pid]) )
+            var replyParts = splitCodeBlocks( bodyToString(players[pid].body)+"\n\n* means the part is required, if hp reaches 0%, you instantly die\n\nNourishment\n"+padd("",49,"─")+"\n"+nutritionString(players[pid]) )
             await interaction.reply(replyParts[0]);
             for(var i = 1; i < replyParts.length; i++){
                 await interaction.followUp(replyParts[i])
@@ -1212,7 +1252,7 @@ client.on('interactionCreate', async (interaction) => {
 
         if(interaction.commandName == "checkhealth"){
             //await interaction.reply("```\n"+bodyToString(players[pid].body)+"\n```");
-            var replyParts = splitCodeBlocks( getAllModifiersString(players[pid].body)+"\n\nNourishment\n────────────────────\n"+nutritionString(players[pid]) )
+            var replyParts = splitCodeBlocks( getAllModifiersString(players[pid].body)+"\n\nNourishment\n"+padd("",49,"─")+"\n"+nutritionString(players[pid]) )
             await interaction.reply(replyParts[0]);
             for(var i = 1; i < replyParts.length; i++){
                 await interaction.followUp(replyParts[i])
