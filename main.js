@@ -3,6 +3,7 @@ const baseBody = require("./spine")
 const commands = require("./commandBuilder")
 const generateMap = require("./mapGeneration")
 const windCalc = require("./windSpeedCalculator.js")
+const nutritionData = require("./nutritionData")
 var CLIENT_ID = "738108203505549342"
 var fs = require("fs")
 
@@ -183,21 +184,7 @@ class player{
         // Internal properties
         //this.hunger = 100;
         //this.thirst = 100;
-        this.nutrition = {
-            "a":1800, //micrograms // Vitamin A
-            "b12":4.8, //micrograms // Vitamin B12
-            "c":160, //miligrams // Vitamin C
-            "e":30, //miligrams // Vitamin E
-            "fe":24, //miligrams // Iron
-            "iodine":300, // micrograms
-            "sodium":1000, // miligrams
-            "potassium":6000, //miligrams
-            "calcium":300, //miligrams
-            "zinc":20, //miligrams
-            "copper":1800, //micrograms
-            "water":4000, //grams // Thirst level essentially
-            "calories":4000, //kCal // All activities consume calories
-        }
+        this.nutrition = nutritionData.defaultStartingNutrientAmounts
 
         this.sleep = 100;
 
@@ -819,21 +806,7 @@ function handlePlayerStarvation(player){
 }
 
 function nutritionTick(player){
-    let nutritionUsage = {
-        "a":900, //micrograms // Vitamin A
-        "b12":2.4, //micrograms // Vitamin B12
-        "c":80, //miligrams // Vitamin C
-        "e":15, //miligrams // Vitamin E
-        "fe":12, //miligrams // Iron
-        "iodine":150, // micrograms
-        "sodium":500, // miligrams
-        "potassium":3000, //miligrams
-        "calcium":150, //miligrams
-        "zinc":10, //miligrams
-        "copper":900, //micrograms
-        "water":2000, //grams // Thirst level essentially
-        "calories":2000, //kCal // All activities consume calories
-    }
+    let nutritionUsage = nutritionData.nutritionUsage
 
     const accuracy = 1000000;
     // Go though every nutrition value and then reduce the amount of that vitamin/mineral per game tick.
@@ -862,68 +835,19 @@ function capitalizeFirstLetter(string) {
 }
 
 function nutritionString(p){
-    let units = {
-        "a":"μg", // Vitamin A
-        "b12":"μg", // Vitamin B12
-        "c":"mg", // Vitamin C
-        "e":"mg", // Vitamin E
-        "fe":"mg", // Iron
-        "iodine":"μg",
-        "sodium":"mg",
-        "potassium":"mg",
-        "calcium":"mg",
-        "zinc":"mg",
-        "copper":"μg",
-        "water":"g", // Thirst level essentially
-        "calories":"kCal", // All activities consume calories
-    }
+    let nutritionUnits = nutritionData.units
+    let dailyValue = nutritionData.dailyValue
+    let overdoseLevels = nutritionData.overdoseLevels
+    let commonNames = nutritionData.commonNames
 
-    let dailyValue = {
-        "a":900, //micrograms // Vitamin A
-        "b12":2.4, //micrograms // Vitamin B12
-        "c":80, //miligrams // Vitamin C
-        "e":15, //miligrams // Vitamin E
-        "fe":12, //miligrams // Iron
-        "iodine":150, // micrograms
-        "sodium":500, // miligrams
-        "potassium":3000, //miligrams
-        "calcium":150, //miligrams
-        "zinc":10, //miligrams
-        "copper":900, //micrograms
-        "water":2000, //grams // Thirst level essentially
-        "calories":2000, //kCal // All activities consume calories
-    }
-
-    /** TODO: Research overdose levels for the remainder of the nutrients*/
-    let overdoseLevels = {
-        "copper":70000,
-        "iron":25,
-        "zinc":40,
-        "calcium":700
-    }
-
-    // Map of key names to their names used in common vocabulary
-    let commonNames = {
-        "a":"Vitamin A",
-        "b12":"Vitamin B12", 
-        "c":"Vitamin C", 
-        "e":"Vitamin E",
-        "fe":"Iron", 
-        "iodine":"Iodine",
-        "sodium":"Sodium", 
-        "potassium":"Potassium",
-        "calcium":'Calcium', 
-        "zinc":"Zinc", 
-        "copper":"Copper", 
-        "water":"Water", 
-        "calories":"Calories",
-    }
-
-    var output = ""
+    let output = ""
     output += padd("Nutrient",14)+padd("Reserve",10)+"Percentage of Daily Usage\n"
-    for(var k in p.nutrition){
-        var dailyValuePercent = Math.floor((p.nutrition[k]/dailyValue[k])*100)
-        output += padd(commonNames[k],11)+" : "+colorBasedOnPercent(padd(Math.round(p.nutrition[k])+" ",5),dailyValuePercent,k)+padd(units[k]+" ",5)+padd(dailyValuePercent+"%",6)
+    for(let k in p.nutrition){
+        let dailyValuePercent = Math.floor((p.nutrition[k]/dailyValue[k])*100)
+        output += padd(commonNames[k],11)+" : "
+            +colorBasedOnPercent(padd(Math.round(p.nutrition[k])+" ",5),dailyValuePercent,k)
+            +padd(nutritionUnits[k]+" ",5)
+            +padd(dailyValuePercent+"%",6)
         if(dailyValuePercent <= 0){
             output += "malnourished!"
         }
@@ -931,9 +855,9 @@ function nutritionString(p){
             if(overdoseLevels[k] <= p.nutrition[k])
                 output += "overdosing!"
         }
-        output += "\n"
+        output += "\n";
     }
-    return output
+    return output;
 }
 
 function colorBasedOnPercent(string,percent,nutrient){
