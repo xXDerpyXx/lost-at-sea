@@ -1,15 +1,3 @@
-function polarToPlanar(lat,lon){
-    const y = Math.floor((lat+90)*10) //lat
-    const x = Math.floor((lon+180)*10) //lon
-    return [x,y]
-}
-
-function planarToPolar(x, y){
-    const lat = (x / 10) - 90;
-    const lon = (y / 10) - 180
-
-    return [lon, lat]
-}
 
 /**
  * Generalized version of the function y = e^(-x^2)
@@ -172,11 +160,6 @@ function calculateWindDrift(time, latitude, longitude){
     return [newLatitude, newLongitude]
 }
 
-// for (let i = 0 ; i < 100 ; i++){
-//     let windspeedVector = getWindVector(0)
-//
-//     console.log(windspeedVector)
-// }
 
 calculateWindDrift(33, 89,2)
 
