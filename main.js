@@ -791,8 +791,30 @@ function passTime(id,hours){
     }
 }
 
-function nutritionTick(p){
-    var nutritionUsage = {
+//Handle starvation if the player's calorie reserves are less than 0
+function handlePlayerStarvation(player){
+    let alreadyStarving = false;
+    for(let i = 0; i < player.body.spine.chest.stomach.modifiers.length; i++){
+        if(player.body.spine.chest.stomach.modifiers[i].name === "starving"){
+            alreadyStarving = true
+            break;
+        }
+    }
+    if(!alreadyStarving){
+        // Define your starving variable
+        let tempMod = new modifier("starving")
+        tempMod.damage = 0
+        tempMod.growth = 0.00082671
+
+        // Apply starving to the stomach
+        player.body.spine.chest.stomach = applyModifier(player.body.spine.chest.stomach,"this",tempMod)
+    }
+
+    return player;
+}
+
+function nutritionTick(player){
+    let nutritionUsage = {
         "a":900, //micrograms // Vitamin A
         "b12":2.4, //micrograms // Vitamin B12
         "c":80, //miligrams // Vitamin C
@@ -808,32 +830,20 @@ function nutritionTick(p){
         "calories":2000, //kCal // All activities consume calories
     }
 
-    var accuracy = 1000000;
+    const accuracy = 1000000;
+    // Go though every nutrition value and then reduce the amount of that vitamin/mineral per game tick.
+    for(let k in nutritionUsage){
+        player.nutrition[k] -= Math.floor(((nutritionUsage[k]/24)/12)*accuracy)/accuracy
+    }
 
-    for(var k in nutritionUsage){
-        p.nutrition[k] -= Math.floor(((nutritionUsage[k]/24)/12)*accuracy)/accuracy
-    }
-    
-    if(p.nutrition.calories <= 0 ){
-        var alreadyStarving = false;
-        for(var i = 0; i < p.body.spine.chest.stomach.modifiers.length; i++){
-            if(p.body.spine.chest.stomach.modifiers[i].name == "starving"){
-                alreadyStarving = true
-                break;
-            }
-        }
-        if(!alreadyStarving){
-            var tempMod = new modifier("starving")
-            tempMod.damage = 0
-            tempMod.growth = 0.00082671
-            p.body.spine.chest.stomach = applyModifier(p.body.spine.chest.stomach,"this",tempMod)
-        }
-    }
-    return p;
+    // Check if you have ran out of calories
+    if(player.nutrition.calories <= 0 ){ handlePlayerStarvation(player) }
+
+    return player;
 }
 
 function padd(string,length,filler){
-    if(filler == undefined){
+    if(filler === undefined){
         filler = " "
     }
     while(string.length < length){
@@ -847,7 +857,7 @@ function capitalizeFirstLetter(string) {
 }
 
 function nutritionString(p){
-    var units = {
+    let units = {
         "a":"μg", // Vitamin A
         "b12":"μg", // Vitamin B12
         "c":"mg", // Vitamin C
@@ -863,7 +873,7 @@ function nutritionString(p){
         "calories":"kCal", // All activities consume calories
     }
 
-    var dailyValue = {
+    let dailyValue = {
         "a":900, //micrograms // Vitamin A
         "b12":2.4, //micrograms // Vitamin B12
         "c":80, //miligrams // Vitamin C
@@ -879,14 +889,16 @@ function nutritionString(p){
         "calories":2000, //kCal // All activities consume calories
     }
 
-    var overdoseLevels = {
+    /** TODO: Research overdose levels for the remainder of the nutrients*/
+    let overdoseLevels = {
         "copper":70000,
         "iron":25,
         "zinc":40,
         "calcium":700
     }
 
-    var commonNames = {
+    // Map of key names to their names used in common vocabulary
+    let commonNames = {
         "a":"Vitamin A",
         "b12":"Vitamin B12", 
         "c":"Vitamin C", 
@@ -901,6 +913,7 @@ function nutritionString(p){
         "water":"Water", 
         "calories":"Calories",
     }
+
     var output = ""
     output += padd("Nutrient",14)+padd("Reserve",10)+"Percentage of Daily Usage\n"
     for(var k in p.nutrition){
