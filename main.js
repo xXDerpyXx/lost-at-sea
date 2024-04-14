@@ -205,6 +205,11 @@ class player{
         this.daysAtSea = 0; // Player's time spent in the game
         this.constantTime = 0; // hours of time in game TOTAL (used for timekeeping)
 
+        this.weather = {
+            temperature:294,
+            humidity:1,
+        }
+
         this.swimmingSpeed = 2
 
         this.body = new body()
@@ -1225,6 +1230,7 @@ client.on('interactionCreate', async (interaction) => {
                 var temp = adjustForCurve(players[pid].latitude,players[pid].longitude)
                 players[pid].latitude = temp[0]
                 players[pid].longitude = temp[1]
+                players[pid].nutrition.calories -= 528 * (1/12)
                 passTime(pid,1/12)
                 players[pid] = autoDrift(players[pid],1/12)
                 if(deadCheck(players[pid].body)[1]){
