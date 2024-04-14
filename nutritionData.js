@@ -74,4 +74,4 @@ let commonNames = {
     "calories":"Calories",
 }
 
-module.exports = {units, defaultStartingNutrientAmounts, nutritionUsage,dailyValue, overdoseLevels, commonNames}
+module.exports = {units, defaultStartingNutrientAmounts,dailyValue, overdoseLevels, commonNames}
