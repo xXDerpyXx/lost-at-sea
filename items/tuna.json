@@ -1,4 +1,20 @@
 {
     "name":"tuna",
-    "texture": "                    \n                    \n                    \n        .    .      \n @=   *@@@@@@@@@@   \n :@@@@@-    :% @@@@ \n @     #.=@@#@*@.   \n             :      \n                    \n                    \n                    "
+    "texture": "                    \n                    \n                    \n        .    .      \n @=   *@@@@@@@@@@   \n :@@@@@-    :% @@@@ \n @     #.=@@#@*@.   \n             :      \n                    \n                    \n                    ",
+    "nutrition":{
+        "a":26,
+        "b12":8.64,
+        "c":1.6, 
+        "e":0.486, 
+        "fe":1.68, 
+        "iodine":17, 
+        "sodium":72,
+        "potassium":804,
+        "calcium":9,
+        "zinc":1.188,
+        "copper":39, 
+        "water":50, 
+        "calories":203 
+    },
+    "servingSize":154
 }
