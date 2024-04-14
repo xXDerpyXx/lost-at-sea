@@ -11,11 +11,11 @@ let units = {
     "calcium":"mg",
     "zinc":"mg",
     "copper":"μg",
-    "water":"g", // Thirst level essentially
+    "water":"ml", // Thirst level essentially
     "calories":"kCal", // All activities consume calories
 }
 
-// How much the player starts off as a default (placeholder, I think?)
+// How much the player starts off as a default (placeholder, will be replaced with random food values)
 let defaultStartingNutrientAmounts = {
     "a":1800, //micrograms // Vitamin A
     "b12":4.8, //micrograms // Vitamin B12
@@ -32,24 +32,7 @@ let defaultStartingNutrientAmounts = {
     "calories":4000, //kCal // All activities consume calories
 }
 
-// How much of each nutrient a player uses in a day.
-let nutritionUsage = {
-    "a":900, //micrograms // Vitamin A
-    "b12":2.4, //micrograms // Vitamin B12
-    "c":80, //milligrams // Vitamin C
-    "e":15, //milligrams // Vitamin E
-    "fe":12, //milligrams // Iron
-    "iodine":150, // micrograms
-    "sodium":500, // milligrams
-    "potassium":3000, //milligrams
-    "calcium":150, //milligrams
-    "zinc":10, // milligrams
-    "copper":900, //micrograms
-    "water":2000, //grams // Thirst level essentially
-    "calories":2000, //kCal // All activities consume calories
-}
-
-// How much the player **should** consume in a day
+// How much the player **should** consume in a day (if they're completely stationary)
 let dailyValue = {
     "a":900, //micrograms // Vitamin A
     "b12":2.4, //micrograms // Vitamin B12
@@ -66,7 +49,7 @@ let dailyValue = {
     "calories":2000, //kCal // All activities consume calories
 }
 
-/** TODO: Research overdose levels for the remainder of the nutrients*/
+/** TODO: Research overdose levels for the remainder of the nutrients (does not apply to all nutrients)*/
 let overdoseLevels = {
     "copper":70000,
     "iron":25,
@@ -74,7 +57,7 @@ let overdoseLevels = {
     "calcium":700
 }
 
-// Map of key names to their names used in common vocabulary
+// Map of key names to their names used in common vocabulary (as well as capitalization)
 let commonNames = {
     "a":"Vitamin A",
     "b12":"Vitamin B12",

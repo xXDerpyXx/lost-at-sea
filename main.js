@@ -806,7 +806,7 @@ function handlePlayerStarvation(player){
 }
 
 function nutritionTick(player){
-    let nutritionUsage = nutritionData.nutritionUsage
+    let nutritionUsage = nutritionData.dailyValue
 
     const accuracy = 1000000;
     // Go though every nutrition value and then reduce the amount of that vitamin/mineral per game tick.
