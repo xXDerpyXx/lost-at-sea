@@ -836,13 +836,28 @@ function nutritionTick(player){
     return player;
 }
 
-function padd(string,length,filler){
+function padd(string,length,filler,align){
+    if(align === undefined){
+        align = "left"
+    }
     if(filler === undefined){
         filler = " "
     }
-    while(string.length < length){
-        string += filler
-    }
+    if(align == "left")
+        while(string.length < length)
+            string += filler
+    else if(align == "right")
+        while(string.length < length)
+            string = filler+string
+    else if(align == "centered")
+        while(string.length < length){
+            if(string.length%2==0){
+                string = filler+string
+            }else{
+                string += filler
+            }
+        }
+    
     return string
 }
 
@@ -865,15 +880,25 @@ function nutritionString(p){
     let commonNames = nutritionData.commonNames
 
     let output = ""
-    output += padd("Nutrient",14)+padd("Reserve",10)+"Percentage of Daily Usage\n"
+    output += padd("Nutrient",14)+padd("Reserve",11)+"Percentage of Daily Usage\n"
     for(let k in p.nutrition){
         let dailyValuePercent = Math.floor((p.nutrition[k]/dailyValue[k])*100)
+        var nVal = Math.round(p.nutrition[k])
+        //console.log(nVal.toString().length)
+        if((nVal.toString().length >= 6)){
+            nVal = nVal.toString().substring(0,5)+"+"
+        }
         output += padd(commonNames[k],11)+" : "
-            +colorBasedOnPercent(padd(Math.round(p.nutrition[k])+" ",5),dailyValuePercent,k,p)
+            +colorBasedOnPercent(padd(nVal+" ",6," ","right"),dailyValuePercent,k,p)
             +padd(nutritionUnits[k]+" ",5)
             +padd(dailyValuePercent+"%",6)
         if(dailyValuePercent <= 0){
-            output += "malnourished!"
+            if(k == "water")
+                output += "dehydrated!"
+            else if(k == "calories")
+                output += "starving!"
+            else
+                output += "malnourished!"
         }
         var od = false
         if(overdoseLevels[k] != null){
