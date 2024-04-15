@@ -176,6 +176,7 @@ class body{
 var foods = []
 foods.push(items.tuna);
 foods.push(items.coconut);
+foods.push(items.grouper);
 
 class player{
     constructor(id){

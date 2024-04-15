@@ -1,0 +1,20 @@
+{
+    "name":"grouper",
+    "texture": "                    \n      -=:.  ..      \n  .+%%%####%@@%=*@%+\n=@%#%#*%@%%%%@@@@@%%\n .==*#%@%*+**#*     \n       :            ",
+    "nutrition":{
+        "a":143,
+        "b12":0.6,
+        "c":0, 
+        "e":0.486, 
+        "fe":0.89, 
+        "iodine":2.3, 
+        "sodium":53,
+        "potassium":483,
+        "calcium":27,
+        "zinc":0.48,
+        "copper":2, 
+        "water":79, 
+        "calories":92 
+    },
+    "servingSize":100
+}
