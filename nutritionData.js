@@ -57,6 +57,15 @@ let overdoseLevels = {
     "calcium":700
 }
 
+let intoxicationLevels = {
+    "copper":70000, // fix this
+    "iron":25, // fix this
+    "zinc":40, // fix this
+    "calcium":700, // fix this
+    "b12":20, // currently an estimate
+    "water":8000
+}
+
 // Map of key names to their names used in common vocabulary (as well as capitalization)
 let commonNames = {
     "a":"Vitamin A",
@@ -74,4 +83,4 @@ let commonNames = {
     "calories":"Calories",
 }
 
-module.exports = {units, defaultStartingNutrientAmounts,dailyValue, overdoseLevels, commonNames}
+module.exports = {units, defaultStartingNutrientAmounts,dailyValue, overdoseLevels, intoxicationLevels, commonNames}

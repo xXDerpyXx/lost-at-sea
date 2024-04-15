@@ -173,6 +173,10 @@ class body{
     }
 }
 
+var foods = []
+foods.push(items.tuna);
+foods.push(items.coconut);
+
 class player{
     constructor(id){
         // Player's discord id
@@ -184,7 +188,18 @@ class player{
         // Internal properties
         //this.hunger = 100;
         //this.thirst = 100;
-        this.nutrition = nutritionData.defaultStartingNutrientAmounts
+        var tempPlayer = {}
+        tempPlayer.nutrition = nutritionData.defaultStartingNutrientAmounts;
+        for(var k in tempPlayer.nutrition){
+            tempPlayer.nutrition[k] = 0;
+        }
+        for(var i = 0; i < 12; i ++){
+            tempPlayer = eat(tempPlayer,randomFromArray(foods))
+        }
+        console.log(tempPlayer.nutrition)
+        this.nutrition = tempPlayer.nutrition
+
+        this.inv = [];
 
         this.sleep = 100;
 
@@ -834,10 +849,18 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function eat(p,food){
+    for(var k in food.nutrition){
+        p.nutrition[k] += food.nutrition[k]
+    }
+    return p
+}
+
 function nutritionString(p){
     let nutritionUnits = nutritionData.units
     let dailyValue = nutritionData.dailyValue
     let overdoseLevels = nutritionData.overdoseLevels
+    let intoxicationLevels = nutritionData.intoxicationLevels
     let commonNames = nutritionData.commonNames
 
     let output = ""
@@ -845,22 +868,29 @@ function nutritionString(p){
     for(let k in p.nutrition){
         let dailyValuePercent = Math.floor((p.nutrition[k]/dailyValue[k])*100)
         output += padd(commonNames[k],11)+" : "
-            +colorBasedOnPercent(padd(Math.round(p.nutrition[k])+" ",5),dailyValuePercent,k)
+            +colorBasedOnPercent(padd(Math.round(p.nutrition[k])+" ",5),dailyValuePercent,k,p)
             +padd(nutritionUnits[k]+" ",5)
             +padd(dailyValuePercent+"%",6)
         if(dailyValuePercent <= 0){
             output += "malnourished!"
         }
+        var od = false
         if(overdoseLevels[k] != null){
-            if(overdoseLevels[k] <= p.nutrition[k])
+            if(overdoseLevels[k] <= p.nutrition[k]){
                 output += "overdosing!"
+                od = true;
+            }
+        }
+        if(intoxicationLevels[k] != null && !od){
+            if(intoxicationLevels[k] <= p.nutrition[k])
+                output += "intoxicated!"
         }
         output += "\n";
     }
     return output;
 }
 
-function colorBasedOnPercent(string,percent,nutrient){
+function colorBasedOnPercent(string,percent,nutrient,p){
     if(percent < 10){
         return "[2;31m"+string+"[0m" //red
     }
@@ -873,15 +903,26 @@ function colorBasedOnPercent(string,percent,nutrient){
     if(percent < 200){
         return "[2;36m"+string+"[0m" //teal
     }
+
+    if(nutritionData.overdoseLevels[nutrient] != null){
+        if(nutritionData.overdoseLevels[nutrient] <= p.nutrition[nutrient]){
+            return "[2;31m"+string+"[0m" //red
+        }
+    }
+    if(nutritionData.intoxicationLevels[nutrient] != null){
+        if(nutritionData.intoxicationLevels[nutrient] <= p.nutrition[nutrient])
+            return "[2;35m"+string+"[0m" // pink
+    }
+    /*
     if(nutrient == "copper" && percent >= 7700){
-        return "[2;35m"+string+"[0m" // pink
+         // pink
     }
     if(nutrient == "zinc" && percent >= 400){
         return "[2;35m"+string+"[0m" // pink
     }
     if(nutrient == "calcium" && percent >= 466){
         return "[2;35m"+string+"[0m" // pink
-    }
+    }*/
 
     return "[2;34m"+string+"[0m" //blue
 }
