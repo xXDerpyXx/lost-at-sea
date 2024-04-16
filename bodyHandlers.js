@@ -12,12 +12,12 @@ function padd(string,length,filler,align){
     if(align == "left")
         while(string.length < length)
             string += filler
-    else if(align == "right")
+    else if(align === "right")
         while(string.length < length)
             string = filler+string
-    else if(align == "centered")
+    else if(align === "centered")
         while(string.length < length){
-            if(string.length%2==0){
+            if(string.length%2===0){
                 string = filler+string
             }else{
                 string += filler
@@ -55,6 +55,20 @@ function colorBasedOnPercent(string,percent,nutrient,p){
 }
 
 /**
+ * Apply growing damage (either soft or normal damage)
+ * @param bodyPart body state
+ * @param growth : string : either growth or softGrowth
+ * @param damage : string : either damage or softDamage
+ * */
+function applyGrowingDamage(bodyPart, growth, damage){
+    for(let i in bodyPart.modifiers){
+        if(bodyPart.modifiers[i][growth] > 0){
+            bodyPart.modifiers[i][damage] += bodyPart.modifiers[i][growth];
+        }
+    }
+    return bodyPart
+}
+/**
  * Go through the entire body and update the state of any modifiers it has.
  *
  * @param body body that is to be modified
@@ -82,19 +96,9 @@ function updateBodyModifiers(body,part){
                     }
                 }
             }
-            // Check through modifiers and apply growing damage if applicable
-            for(let i in body[part][p].modifiers){
-                if(body[part][p].modifiers[i].growth > 0){
-                    body[part][p].modifiers[i].damage += body[part][p].modifiers[i].growth;
-                }
-            }
-            // Go through modifiers and apply soft growing damage
-            for(let i in body[part][p].modifiers){
-                if(body[part][p].modifiers[i].softGrowth > 0){
-                    body[part][p].modifiers[i].softDamage += body[part][p].modifiers[i].softGrowth;
-                }
-            }
-            // Check for damage
+            body[part][p] = applyGrowingDamage(body[part][p], "growth", "damage")
+            body[part][p] = applyGrowingDamage(body[part][p], "softGrowth", "softDamage")
+
             if(isInfected){
                 for(let i in tempInfections){
                     if(Math.random() < tempInfections[i].spreadRate  && !hasModifier(body[part][p],tempInfections[i].name)){
@@ -163,7 +167,7 @@ function getAllModifiersString(body,part){
     }
     if (body[part].modifiers.length > 0) { output += "\n"; }
 
-    for(var p in body[part]){
+    for(let p in body[part]){
         if(p !== "hp" && p !== "modifiers" && p !== "required"){
             output += getAllModifiersString(body[part],p);
         }
@@ -217,8 +221,8 @@ function hpToString(bodyPart){
  * @param bodyPart the body part in question
  * */
 function getSubBodyPartCount(bodyPart){
-    count = 0; // Where we build the result
-    for(var subBodyPartKey in bodyPart){
+    let count = 0; // Where we build the result
+    for(let subBodyPartKey in bodyPart){
         if(subBodyPartKey !== "hp" && subBodyPartKey !== "modifiers" && subBodyPartKey !== "required"){
             count++
         }
@@ -226,6 +230,22 @@ function getSubBodyPartCount(bodyPart){
     return count;
 }
 
+/**
+ * Helper function of bodyToString function
+ *
+ * @param bodyPart body part, which is just body[partName]
+ */
+function getBodyPartModifiersString(bodyPart){
+    let mods = ""
+    for(let i = 0; i < bodyPart.modifiers.length; i++){
+        mods += bodyPart.modifiers[i].name; // Add the modifier's name
+        if(i < bodyPart.modifiers.length-1) { mods +=", "; }
+    }
+
+    if(mods.length > 0){ mods = " ("+mods+")" }
+
+    return mods
+}
 function bodyToString(body,partName,layer,layerString){
     var finalString = "" // Result
 
@@ -239,24 +259,17 @@ function bodyToString(body,partName,layer,layerString){
     // We start from the base, which is the spine
     if(partName == null){ partName = "spine"; }
 
+    // Get the string for the modifiers
+    const mods = getBodyPartModifiersString(body[partName]);
+
     // Highlight if the part is required for survival!
     let highlight = "";
     if (body[partName].required !== undefined && body[partName].required === true){ highlight = " *";}
-    let mods = ""
-    for(var i = 0; i < body[partName].modifiers.length; i++){
-        mods += body[partName].modifiers[i].name
-        if(i < body[partName].modifiers.length-1){
-            mods +=", "
-        }
-    }
-
-    if(mods.length > 0){
-        mods = " ("+mods+")"
-    }
     finalString = "["+partName + " <" + hpToString(body[partName]) + ">"+mods+"]"+highlight;
-    if(getBodyPartHp(body[partName])[0] == 0)
+
+    if(getBodyPartHp(body[partName])[0] === 0)
         return finalString+" destroyed!"
-    else if(getBodyPartHp(body[partName])[1] == 0)
+    else if(getBodyPartHp(body[partName])[1] === 0)
         finalString+=" disabled!"
     let partsDone = 0;
     let totalParts = getSubBodyPartCount(body[partName]);
@@ -406,46 +419,66 @@ function nutritionTick(player){
     return player;
 }
 
-function nutritionString(p){
+/**
+ * Helper to nutritionString function
+ * Simply check if the player is malnourished, dehydrated or starving
+ * @param nutrient nutrient to be reported about
+ * @return string
+ */
+function checkNutritionDeficiency(nutrient){
+    if (nutrient === "water") {return "dehydrated"; }
+    else if (nutrient === "calories") {return "starving"; }
+    else {return "malnourished"; }
+}
+
+/**
+ * Helper to nutritionString function
+ * Simply check if the player is Overdosing on a nutrient or Intoxicated
+ * (Hypervitamintosis, mineral toxicity)
+ * @param nutrient nutrient to be reported about
+ * @param playerNutrientLevels player's levels of specified nutrient
+ */
+function checkNutrientToxicity(nutrient, playerNutrientLevels){
+    const overdoseLevels = nutritionData.overdoseLevels;
+    const intoxicationLevels = nutritionData.intoxicationLevels
+
+    let resultString = "";
+    let isOverdosed = false; // Assume false first
+    if (overdoseLevels[nutrient] != null){
+        if (overdoseLevels[nutrient] < playerNutrientLevels){
+            resultString += "overdosing!";
+        }
+    }
+    if (intoxicationLevels[nutrient] != null && !isOverdosed){
+        if(intoxicationLevels[nutrient] <= playerNutrientLevels)
+            resultString += "intoxicated!"
+    }
+    resultString += "\n";
+    return resultString;
+}
+
+function nutritionString(player){
     let nutritionUnits = nutritionData.units
     let dailyValue = nutritionData.dailyValue
-    let overdoseLevels = nutritionData.overdoseLevels
-    let intoxicationLevels = nutritionData.intoxicationLevels
     let commonNames = nutritionData.commonNames
 
     let output = ""
     output += padd("Nutrient",14)+padd("Reserve",11)+"Percentage of Daily Usage\n"
-    for(let k in p.nutrition){
-        let dailyValuePercent = Math.floor((p.nutrition[k]/dailyValue[k])*100)
-        var nVal = Math.round(p.nutrition[k])
+    for(let nutrient in player.nutrition){
+        let dailyValuePercent = Math.floor((player.nutrition[nutrient]/dailyValue[nutrient])*100)
+        let nVal = Math.round(player.nutrition[nutrient])
         //console.log(nVal.toString().length)
         if((nVal.toString().length >= 6)){
             nVal = nVal.toString().substring(0,5)+"+"
         }
-        output += padd(commonNames[k],11)+" : "
-            +colorBasedOnPercent(padd(nVal+" ",6," ","right"),dailyValuePercent,k,p)
-            +padd(nutritionUnits[k]+" ",5)
+        output += padd(commonNames[nutrient],11)+" : "
+            +colorBasedOnPercent(padd(nVal+" ",6," ","right")
+                ,dailyValuePercent,nutrient,player)
+            +padd(nutritionUnits[nutrient]+" ",5)
             +padd(dailyValuePercent+"%",6)
-        if(dailyValuePercent <= 0){
-            if(k == "water")
-                output += "dehydrated!"
-            else if(k == "calories")
-                output += "starving!"
-            else
-                output += "malnourished!"
-        }
-        var od = false
-        if(overdoseLevels[k] != null){
-            if(overdoseLevels[k] <= p.nutrition[k]){
-                output += "overdosing!"
-                od = true;
-            }
-        }
-        if(intoxicationLevels[k] != null && !od){
-            if(intoxicationLevels[k] <= p.nutrition[k])
-                output += "intoxicated!"
-        }
-        output += "\n";
+
+        if(dailyValuePercent <= 0) { output += checkNutritionDeficiency(nutrient); }
+        checkNutrientToxicity(nutrient, player.nutrition[nutrient]) // check for overdose/intoxication
     }
     return output;
 }
