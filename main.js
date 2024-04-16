@@ -521,58 +521,58 @@ function healthTick(p){
     return p; // Body with update state
 }
 
-function deadCheck(b,part){
+function deadCheck(body,part){
     let dead = false
+    // Check for pairs of organs
     if(part == null){
         part = "spine"
-        if(getBodyPartHp(b["spine"]["chest"]["leftLung"])[0] === 0 && getBodyPartHp(b["spine"]["chest"]["rightLung"])[0] === 0){
-            return [b[part],true]
-        }
-        if(getBodyPartHp(b["spine"]["lowerTorso"]["leftKidney"])[0] === 0 && getBodyPartHp(b["spine"]["lowerTorso"]["rightKidney"])[0] === 0){
-            return [b[part],true]
-        }
+        const isLeftLungZeroHP = getBodyPartHp(body["spine"]["chest"]["leftLung"])[0] === 0;
+        const isRightLungZeroHP = getBodyPartHp(body["spine"]["chest"]["rightLung"])[0] === 0;
+        const isLeftKidneyZeroHP = getBodyPartHp(body["spine"]["lowerTorso"]["leftKidney"])[0] === 0;
+        const isRightKidneyZeroHP = getBodyPartHp(body["spine"]["lowerTorso"]["rightKidney"])[0] === 0;
+        if (isLeftLungZeroHP && isRightLungZeroHP) { return [body[part],true]; }
+        if (isLeftKidneyZeroHP && isRightKidneyZeroHP) { return [body[part],true] }
     }
 
-
-
-    if(getBodyPartHp(b)[0] == 0 && b.required){
+    if(getBodyPartHp(body)[0] === 0 && body.required){
         dead = true;
-        return [b[part],dead]
+        return [body[part],dead]
     }
-    for(var p in b){
-        if(p != "hp" && p != "modifiers" && p != "required"){
-            var check = deadCheck(b[p],p);
+    for(let subBodyPart in body){
+        if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
+            //
+            let check = deadCheck(body[subBodyPart],subBodyPart);
             if(check[1]){
                 dead = true;
-                return [b[part],dead]
+                return [body[part],dead]
             }
         }
     }
-    return [b[part],dead]
+    return [body[part],dead]
 }
 
-function getAllModifiersString(b,part){
+function getAllModifiersString(body,part){
     var output = ""
     if(part == null){
         part = "spine"
     }
-    if(b[part].modifiers.length > 0){
+    if(body[part].modifiers.length > 0){
         output += part+": "
     }
     
-    for(var i = 0; i < b[part].modifiers.length; i++){
-        output += b[part].modifiers[i].name
-        if(i < b[part].modifiers.length-1)
+    for(var i = 0; i < body[part].modifiers.length; i++){
+        output += body[part].modifiers[i].name
+        if(i < body[part].modifiers.length-1)
             output += ", "
     }
-    if(b[part].modifiers.length > 0){
+    if(body[part].modifiers.length > 0){
         output += "\n"
     }
     
 
-    for(var p in b[part]){
+    for(var p in body[part]){
         if(p != "hp" && p != "modifiers" && p != "required"){
-            output += getAllModifiersString(b[part],p);
+            output += getAllModifiersString(body[part],p);
         }
     }
     return output
