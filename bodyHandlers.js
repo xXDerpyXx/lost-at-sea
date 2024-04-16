@@ -2,6 +2,58 @@
 
 const nutritionData = require("./nutritionData");
 
+function padd(string,length,filler,align){
+    if(align === undefined){
+        align = "left"
+    }
+    if(filler === undefined){
+        filler = " "
+    }
+    if(align == "left")
+        while(string.length < length)
+            string += filler
+    else if(align == "right")
+        while(string.length < length)
+            string = filler+string
+    else if(align == "centered")
+        while(string.length < length){
+            if(string.length%2==0){
+                string = filler+string
+            }else{
+                string += filler
+            }
+        }
+    
+    return string
+}
+
+function colorBasedOnPercent(string,percent,nutrient,p){
+    if(percent < 10){
+        return "[2;31m"+string+"[0m" //red
+    }
+    if(percent < 50){
+        return "[2;33m"+string+"[0m" //yellow
+    }
+    if(percent < 100){
+        return "[2;32m"+string+"[0m" //green
+    }
+    if(percent < 200){
+        return "[2;36m"+string+"[0m" //teal
+    }
+
+    if(nutritionData.overdoseLevels[nutrient] != null){
+        if(nutritionData.overdoseLevels[nutrient] <= p.nutrition[nutrient]){
+            return "[2;31m"+string+"[0m" //red
+        }
+    }
+    if(nutritionData.intoxicationLevels[nutrient] != null){
+        if(nutritionData.intoxicationLevels[nutrient] <= p.nutrition[nutrient])
+            return "[2;35m"+string+"[0m" // pink
+    }
+
+    return "[2;34m"+string+"[0m" //blue
+}
+
 /**
  * Go through the entire body and update the state of any modifiers it has.
  *
