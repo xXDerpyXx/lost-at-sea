@@ -100,26 +100,19 @@ function deadCheck(body,part){
 }
 
 function getAllModifiersString(body,part){
-    var output = ""
-    if(part == null){
-        part = "spine"
-    }
-    if(body[part].modifiers.length > 0){
-        output += part+": "
-    }
+    let output = ""
+    if(part == null){ part = "spine"; }
+    // print the initial body part
+    if(body[part].modifiers.length > 0){ output += part+": "; }
 
-    for(var i = 0; i < body[part].modifiers.length; i++){
-        output += body[part].modifiers[i].name
-        if(i < body[part].modifiers.length-1)
-            output += ", "
+    for(let i = 0; i < body[part].modifiers.length; i++){
+        output += body[part].modifiers[i].name;
+        if (i < body[part].modifiers.length-1) { output += ", "; }
     }
-    if(body[part].modifiers.length > 0){
-        output += "\n"
-    }
-
+    if (body[part].modifiers.length > 0) { output += "\n"; }
 
     for(var p in body[part]){
-        if(p != "hp" && p != "modifiers" && p != "required"){
+        if(p !== "hp" && p !== "modifiers" && p !== "required"){
             output += getAllModifiersString(body[part],p);
         }
     }
@@ -185,24 +178,19 @@ function bodyToString(body,partName,layer,layerString){
     var finalString = "" // Result
 
     // Establish default values
-    if(layerString == null){
-        layerString = ""
-    }
-    if(layer == null){
+    if (layerString == null) { layerString = ""; }
+    if (layer == null){
         layer = 0;
     }else{
         layer++;
     }
-    if(partName == null){ // We start from the base, which is the spine
-        partName = "spine"
-    }
+    // We start from the base, which is the spine
+    if(partName == null){ partName = "spine"; }
 
     // Highlight if the part is required for survival!
-    var highlight = ""
-    if (body[partName].required !== undefined && body[partName].required === true){
-        highlight = " *"
-    }
-    var mods = ""
+    let highlight = "";
+    if (body[partName].required !== undefined && body[partName].required === true){ highlight = " *";}
+    let mods = ""
     for(var i = 0; i < body[partName].modifiers.length; i++){
         mods += body[partName].modifiers[i].name
         if(i < body[partName].modifiers.length-1){
@@ -258,7 +246,7 @@ function bodyToString(body,partName,layer,layerString){
  * */
 function applyModifier(bodyPart,targetPart,modifier){
 
-    if(targetPart == "this"){
+    if(targetPart === "this"){
         bodyPart.modifiers.push(modifier)
     }else{
         for(let subBodyPart in bodyPart){
@@ -278,11 +266,14 @@ function applyModifier(bodyPart,targetPart,modifier){
     return bodyPart;
 }
 
+/**
+ * check if the body part has a modifier of a specified modifier name
+ * @param bodyPart body part
+ * @param modName modifier name to check against
+ * */
 function hasModifier(bodyPart,modName){
-    for(var i = 0; i < bodyPart.modifiers.length; i++){
-        if(bodyPart.modifiers[i].name == modName){
-            return true;
-        }
+    for(let i = 0; i < bodyPart.modifiers.length; i++){
+        if(bodyPart.modifiers[i].name === modName){ return true; }
     }
     return false;
 }
@@ -291,20 +282,17 @@ function hasModifier(bodyPart,modName){
  * Internal helper function to applyComplexDamage
  *
  * */
-function complexDamage(t,mod,bodyPart,r){
-
-    if(r == null){
-        r = 0.5
-    }
+function complexDamage(damageType,mod,bodyPart,effectProbability){
+    if (effectProbability == null) { effectProbability = 0.5; } //Assume 50/50
 
     applyModifier(bodyPart,"this",mod)
-    if(t == "penetration"){
+    if(damageType === "penetration"){
         for(let subBodyPart in bodyPart){
-            // Check through every sub-body-part that body part has (exclude keys that aren't sub-body-parts ofc)
+            // Check through every sub-body-part that body part has (exclude keys that aren't damageType
             if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
-                if(Math.random() < r){
+                if(Math.random() < effectProbability){
                     // Recursive case, perform your BFS until you find the body aprt
-                    bodyPart[subBodyPart] = complexDamage(t,mod,bodyPart[subBodyPart],r)
+                    bodyPart[subBodyPart] = complexDamage(damageType,mod,bodyPart[subBodyPart],effectProbability)
                 }
             }
         }
@@ -312,17 +300,17 @@ function complexDamage(t,mod,bodyPart,r){
     return bodyPart
 }
 
-function applyComplexDamage(t,mod,bodyPart,r,targetPart){
+function applyComplexDamage(damageType,mod,bodyPart,effectProbability,targetPart){
     for(let subBodyPart in bodyPart){
-        // Check through every sub-body-part that body part has (exclude keys that aren't sub-body-parts ofc)
+        // Check through every sub-body-part that body part has (exclude keys that aren'damageType sub-body-parts ofc)
         if(subBodyPart !== "hp" && subBodyPart !== "modifiers" && subBodyPart !== "required"){
             if(subBodyPart === targetPart){
                 // Body part found, apply the modifier!
-                bodyPart[subBodyPart] = complexDamage(t,mod,bodyPart[subBodyPart],r)
+                bodyPart[subBodyPart] = complexDamage(damageType,mod,bodyPart[subBodyPart],effectProbability)
                 return bodyPart
             }else{
                 // Recursive case, perform your BFS until you find the body aprt
-                bodyPart[subBodyPart] = applyComplexDamage(t,mod,bodyPart[subBodyPart],r,targetPart)
+                bodyPart[subBodyPart] = applyComplexDamage(damageType,mod,bodyPart[subBodyPart],effectProbability,targetPart)
             }
         }
     }
