@@ -225,9 +225,9 @@ class player{
 
         for(var j = 0; j < 7; j++){
             for(var i = 0; i < 3; i ++){
-                tempPlayer = eat(tempPlayer,randomFromArray(foods))
-                tempPlayer = eat(tempPlayer,randomFromArray(foods))
-                tempPlayer = eat(tempPlayer,randomFromArray(foods))
+                tempPlayer = eat(tempPlayer,randomFromArray(foods),200)
+                tempPlayer = eat(tempPlayer,randomFromArray(foods),100)
+                tempPlayer = eat(tempPlayer,randomFromArray(foods),50)
                 tempPlayer = passTime(tempPlayer,5)
             }
             tempPlayer = passTime(tempPlayer)
@@ -541,11 +541,15 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function eat(p,food){
-    for(var k in food.nutrition){
-        p.nutrition[k] += food.nutrition[k]
+function eat(p,food,serving){
+    if(serving === undefined){
+        serving = 100
     }
-    p.foodHistory.push(food.name)
+    var portion = serving/food.servingSize
+    for(var k in food.nutrition){
+        p.nutrition[k] += food.nutrition[k]*portion
+    }
+    p.foodHistory.push(food.name+" x"+serving+"g")
     return p
 }
 

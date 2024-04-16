@@ -479,6 +479,7 @@ function nutritionString(player){
 
         if(dailyValuePercent <= 0) { output += checkNutritionDeficiency(nutrient); }
         checkNutrientToxicity(nutrient, player.nutrition[nutrient]) // check for overdose/intoxication
+        output += "\n"
     }
     return output;
 }
