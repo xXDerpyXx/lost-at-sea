@@ -447,80 +447,88 @@ function biome(lat,lon){
     return "hell"
 }
 
+/**
+ * Wrap latitude and longitude back to accepted values incase they go insane
+ * */
 function adjustForCurve(lat,lon){
-    while(lat > 90)
-        lat-=180
-    while(lat < -90)
-        lat+=180
-
-    while(lon > 180)
-        lon-=360
-    while(lon < -180)
-        lon+=360
-    return [lat,lon]
+    // Latitude adjuster
+    while(lat > 90) { lat -= 180; }
+    while(lat < -90) { lat += 180; }
+    // Longitude adjuster
+    while(lon > 180) { lon -= 360; }
+    while(lon < -180) { lon += 360 }
+    return [lat,lon];
 }
 
+/**
+ * Go through the entire body and update the state of any modifiers it has.
+ * */
+function updateBodyModifiers(body,part){
+    if(part == null){ part = "spine"; } // Base case, when the function is being called non-recursively.
 
-function healthBodycheck(b,part){
-    if(part == null){
-        part = "spine"
-    }
     let tempInfections = [];
     let isInfected = false;
     //console.log(part)
-    for(var i in b[part].modifiers){
-        if(b[part].modifiers[i].spreads){
+    for(var i in body[part].modifiers){
+        if(body[part].modifiers[i].spreads){
             isInfected = true;
-            tempInfections.push(b[part].modifiers[i])
+            tempInfections.push(body[part].modifiers[i])
         }
     }
-    for(let p in b[part]){
-        if(p != "hp" && p != "modifiers" && p != "required"){
-            for(var i in b[part][p].modifiers){
-                if(b[part][p].modifiers[i].spreads && !hasModifier(b[part],b[part][p].modifiers[i].name)){
-                    if(Math.random() < b[part][p].modifiers[i].spreadRate){
-                        b = applyModifier(b,part,b[part][p].modifiers[i])
+    for(let p in body[part]){
+        if(p !== "hp" && p !== "modifiers" && p !== "required"){
+            // Check through modifiers apply spread is applicable
+            for(let i in body[part][p].modifiers){
+                if(body[part][p].modifiers[i].spreads && !hasModifier(body[part],body[part][p].modifiers[i].name)){
+                    if(Math.random() < body[part][p].modifiers[i].spreadRate){
+                        body = applyModifier(body,part,body[part][p].modifiers[i])
                     }
                 }
             }
-            for(let i in b[part][p].modifiers){
-                if(b[part][p].modifiers[i].growth > 0){
-                    b[part][p].modifiers[i].damage += b[part][p].modifiers[i].growth;
+            // Check through modifiers and apply growing damage if applicable
+            for(let i in body[part][p].modifiers){
+                if(body[part][p].modifiers[i].growth > 0){
+                    body[part][p].modifiers[i].damage += body[part][p].modifiers[i].growth;
                 }
             }
-
-            for(let i in b[part][p].modifiers){
-                if(b[part][p].modifiers[i].softGrowth > 0){
-                    b[part][p].modifiers[i].softDamage += b[part][p].modifiers[i].softGrowth;
+            // Go through modifiers and apply soft growing damage
+            for(let i in body[part][p].modifiers){
+                if(body[part][p].modifiers[i].softGrowth > 0){
+                    body[part][p].modifiers[i].softDamage += body[part][p].modifiers[i].softGrowth;
                 }
             }
+            // Check for damage
             if(isInfected){
                 for(let i in tempInfections){
-                    if(Math.random() < tempInfections[i].spreadRate  && !hasModifier(b[part][p],tempInfections[i].name)){
-                        b = applyModifier(b,p,tempInfections[i])
+                    if(Math.random() < tempInfections[i].spreadRate  && !hasModifier(body[part][p],tempInfections[i].name)){
+                        body = applyModifier(body,p,tempInfections[i])
                     }
                 }
             }
-            b[part] = healthBodycheck(b[part],p)
+            // Recursive case
+            body[part] = updateBodyModifiers(body[part],p);
         }
     }
-    return b
+    return body;
 }
 
+/**
+ * Update the body's health state (modifiers) per game tick
+ * */
 function healthTick(p){
-    p.body = healthBodycheck(p.body)
+    p.body = updateBodyModifiers(p.body);
 
-    return p
+    return p; // Body with update state
 }
 
 function deadCheck(b,part){
-    dead = false
+    let dead = false
     if(part == null){
         part = "spine"
-        if(getBodyPartHp(b["spine"]["chest"]["leftLung"])[0] == 0 && getBodyPartHp(b["spine"]["chest"]["rightLung"])[0] == 0){
+        if(getBodyPartHp(b["spine"]["chest"]["leftLung"])[0] === 0 && getBodyPartHp(b["spine"]["chest"]["rightLung"])[0] === 0){
             return [b[part],true]
         }
-        if(getBodyPartHp(b["spine"]["lowerTorso"]["leftKidney"])[0] == 0 && getBodyPartHp(b["spine"]["lowerTorso"]["rightKidney"])[0] == 0){
+        if(getBodyPartHp(b["spine"]["lowerTorso"]["leftKidney"])[0] === 0 && getBodyPartHp(b["spine"]["lowerTorso"]["rightKidney"])[0] === 0){
             return [b[part],true]
         }
     }
@@ -959,16 +967,6 @@ function colorBasedOnPercent(string,percent,nutrient,p){
         if(nutritionData.intoxicationLevels[nutrient] <= p.nutrition[nutrient])
             return "[2;35m"+string+"[0m" // pink
     }
-    /*
-    if(nutrient == "copper" && percent >= 7700){
-         // pink
-    }
-    if(nutrient == "zinc" && percent >= 400){
-        return "[2;35m"+string+"[0m" // pink
-    }
-    if(nutrient == "calcium" && percent >= 466){
-        return "[2;35m"+string+"[0m" // pink
-    }*/
 
     return "[2;34m"+string+"[0m" //blue
 }
@@ -1078,7 +1076,7 @@ client.on('ready',()=>{
 function movePlayer(p,lat,lon){
     p.latitude += lat;
     p.longitude += lon;
-    [lat,lon] = adjustForCurve(lat,lon)
+    [lat,lon] = adjustForCurve(lat,lon);
     p.latitude = lat;
     p.longitude = lon;
     return p;
