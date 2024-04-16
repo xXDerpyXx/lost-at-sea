@@ -1,0 +1,20 @@
+{
+    "name":"cassava root",
+    "texture": "   ..:....          \n -+-::-==++++**+:.  \n.-+==++++++++***##+.\n .=**###*+=-:.      ",
+    "nutrition":{
+        "a":1.4,
+        "b12":0,
+        "c":16, 
+        "e":0.1, 
+        "fe":0.27, 
+        "iodine":0, 
+        "sodium":14,
+        "potassium":271,
+        "calcium":16,
+        "zinc":0.34,
+        "copper":100, 
+        "water":60, 
+        "calories":160 
+    },
+    "servingSize":100
+}

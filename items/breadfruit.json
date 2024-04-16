@@ -1,0 +1,20 @@
+{
+    "name":"breadfruit",
+    "texture": "        ....        \n     .=++++==-.     \n    :-==++===-:.    \n   .--=++++==-:.    \n   .--=+++++=--.    \n    .==+++++=-.     \n      .:==-:.       ",
+    "nutrition":{
+        "a":1.4,
+        "b12":0,
+        "c":16, 
+        "e":0.1, 
+        "fe":10.9, 
+        "iodine":2, 
+        "sodium":12,
+        "potassium":760,
+        "calcium":29,
+        "zinc":0.18,
+        "copper":140, 
+        "water":70, 
+        "calories":100 
+    },
+    "servingSize":100
+}

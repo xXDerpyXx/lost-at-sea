@@ -177,6 +177,8 @@ var foods = []
 foods.push(items.tuna);
 foods.push(items.coconut);
 foods.push(items.grouper);
+foods.push(items.cassava);
+foods.push(items.breadfruit);
 
 class player{
     constructor(id){
@@ -189,16 +191,7 @@ class player{
         // Internal properties
         //this.hunger = 100;
         //this.thirst = 100;
-        var tempPlayer = {}
-        tempPlayer.nutrition = nutritionData.defaultStartingNutrientAmounts;
-        for(var k in tempPlayer.nutrition){
-            tempPlayer.nutrition[k] = 0;
-        }
-        for(var i = 0; i < 12; i ++){
-            tempPlayer = eat(tempPlayer,randomFromArray(foods))
-        }
-        console.log(tempPlayer.nutrition)
-        this.nutrition = tempPlayer.nutrition
+        
 
         this.inv = [];
 
@@ -216,6 +209,31 @@ class player{
         this.swimmingSpeed = 2
 
         this.body = new body()
+
+        this.foodHistory = []
+
+        var tempPlayer = this
+        tempPlayer.nutrition = nutritionData.defaultStartingNutrientAmounts;
+        for(var k in tempPlayer.nutrition){
+            tempPlayer.nutrition[k] = 0;
+        }
+
+        for(var i = 0; i < 3; i ++){
+            tempPlayer = eat(tempPlayer,randomFromArray(foods))
+        }
+
+        for(var j = 0; j < 7; j++){
+            for(var i = 0; i < 3; i ++){
+                tempPlayer = eat(tempPlayer,randomFromArray(foods))
+                tempPlayer = eat(tempPlayer,randomFromArray(foods))
+                tempPlayer = eat(tempPlayer,randomFromArray(foods))
+                tempPlayer = passTime(tempPlayer,5)
+            }
+            tempPlayer = passTime(tempPlayer)
+        }
+        console.log(tempPlayer.foodHistory)
+        console.log(tempPlayer.nutrition)
+        this.nutrition = tempPlayer.nutrition
     }
 }
 
@@ -783,20 +801,21 @@ function applyComplexDamage(t,mod,bodyPart,r,targetPart){
  * @param id user's discord id
  * @param hours how many hours you want to increment
  * */
-function passTime(id,hours){
-    players[id].time += hours;
-    players[id].constantTime += hours;
+function passTime(p,hours){
+    p.time += hours;
+    p.constantTime += hours;
     var tempHours = hours
     while(tempHours > 0){
-        players[id] = nutritionTick(players[id])
-        players[id] = healthTick(players[id])
+        p = nutritionTick(p)
+        p = healthTick(p)
         tempHours -= 1/12
     }
     // Account for hours
-    while(players[id].time > 24){
-        players[id].time -= 24;
-        players[id].daysAtSea+=1
+    while(p.time > 24){
+        p.time -= 24;
+        p.daysAtSea+=1
     }
+    return p
 }
 
 //Handle starvation if the player's calorie reserves are less than 0
@@ -869,6 +888,7 @@ function eat(p,food){
     for(var k in food.nutrition){
         p.nutrition[k] += food.nutrition[k]
     }
+    p.foodHistory.push(food.name)
     return p
 }
 
@@ -1222,7 +1242,7 @@ client.on('interactionCreate', async (interaction) => {
                 players[pid].latitude = temp[0]
                 players[pid].longitude = temp[1]
                 players[pid].nutrition.calories -= 528 * (1/12)
-                passTime(pid,1/12)
+                players[pid] = passTime(players[pid],1/12)
                 players[pid] = autoDrift(players[pid],1/12)
                 if(deadCheck(players[pid].body)[1]){
                     interaction.reply("you died while swimming")
@@ -1289,7 +1309,7 @@ client.on('interactionCreate', async (interaction) => {
                     save(false);
                     return
                 }else{
-                    passTime(pid,parseFloat(interaction.options.getString("hours")))
+                    players[pid] = passTime(players[pid],parseFloat(interaction.options.getString("hours")))
                     interaction.reply("you have slept "+interaction.options.getString("hours")+" hours");
                     players[pid] = autoDrift(players[pid],parseFloat(interaction.options.getString("hours")))
                     save(false)
