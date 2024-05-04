@@ -445,7 +445,7 @@ function checkNutrientToxicity(nutrient, playerNutrientLevels){
     let resultString = "";
     let isOverdosed = false; // Assume false first
     if (overdoseLevels[nutrient] != null){
-        if (overdoseLevels[nutrient] < playerNutrientLevels){
+        if (overdoseLevels[nutrient] <= playerNutrientLevels){
             resultString += "overdosing!";
         }
     }
